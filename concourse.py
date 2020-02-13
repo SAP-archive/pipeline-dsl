@@ -55,7 +55,7 @@ class InitTask:
         "run" : {
           "path": "/bin/bash",
           "args" : [ 
-            '-ceux', 
+            '-ceu', 
             'echo "{data}" | base64 -d | tar -C {script_dir} -xjf -'.format(script_dir=SCRIPT_DIR,data=data),
           ],
         }
