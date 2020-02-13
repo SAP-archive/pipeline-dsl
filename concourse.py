@@ -13,7 +13,7 @@ import argparse
 CACHE_DIR = 'tasks'
 SCRIPT_DIR = 'scripts'
 class Task:
-  def __init__(self, name, jobname, timeout, image_resource,script,inputs):
+  def __init__(self, name, jobname, timeout, image_resource,script,inputs,credentials):
       self.name = name
       self.timeout = timeout
       self.config =  {
@@ -21,6 +21,7 @@ class Task:
         "image_resource": image_resource,
         "outputs": [ { "name" : CACHE_DIR} ],
         "inputs": [ { "name" : CACHE_DIR},  { "name" : SCRIPT_DIR} ] + list(map(lambda x: {"name": x}, inputs)) ,
+        "params": list(map(lambda x: { x : '(({}))'.format(x) }, credentials)),
         "run" : {
           "path": "/usr/bin/python3",
           "args" : [ os.path.join(SCRIPT_DIR,os.path.basename(script)), "--job", jobname , "--task" , name ],
@@ -107,29 +108,34 @@ class Job:
     self.inputs.append(name)
     return resource.dir(name)
 
-  def task(self,name,fun,timeout="5m",image_resource=None,resources=[]):
+  def task(self,name,timeout="5m",image_resource=None,resources=[],credentials=[]):
     if  not image_resource:
       image_resource = self.image_resource
-    self.plan.append(Task(name,self.name,timeout,image_resource,self.script,self.inputs))
-    cache_file = os.path.join(CACHE_DIR, self.name, name + ".json")
-    def fn():
-      print("Running: {}".format(name))
-      result = fun()
-      os.makedirs(os.path.dirname(cache_file), exist_ok=True)
-      with open(cache_file,'w') as fd:
-        json.dump(result,fd)
-      return result
+    def decorate(fun):
+      self.plan.append(Task(name,self.name,timeout,image_resource,self.script,self.inputs,credentials))
+      cache_file = os.path.join(CACHE_DIR, self.name, name + ".json")
+      def fn():
+        print("Running: {}".format(name))
+        kwargs = {}
+        for c in credentials:
+          kwargs[c] = os.getenv(c)
+        result = fun(**kwargs)
+        os.makedirs(os.path.dirname(cache_file), exist_ok=True)
+        with open(cache_file,'w') as fd:
+          json.dump(result,fd)
+        return result
 
-    def fn_cached():
-      try:
-        with open(cache_file,'r') as fd:
-          return json.load(fd)
-      except FileNotFoundError:
-        return fn()
-    
-    self.tasks[name] = fn
-    self.last_task = fn_cached
-    return self.last_task
+      def fn_cached():
+        try:
+          with open(cache_file,'r') as fd:
+            return json.load(fd)
+        except FileNotFoundError:
+          return fn()
+      
+      self.tasks[name] = fn
+      self.last_task = fn_cached
+      return self.last_task
+    return decorate
 
   def concourse(self):
     return {
@@ -181,42 +187,41 @@ class Pipeline():
       "resources" : list(map(lambda kv: kv[1].concourse(kv[0]), self.resources.items())),
       "jobs" : list(map(lambda x: x.concourse(), self.jobs)),
     }
+  
+  def main(self):
+    parser = argparse.ArgumentParser(description='Python concourse interface')
+    parser.add_argument('--job',help='name of the job to run')
+    parser.add_argument('--task',help='name of the task to run')
+    parser.add_argument('--concourse', dest='concourse', action='store_true', help='dump concourse')
+
+    args = parser.parse_args()
+
+    if args.concourse:
+      import yaml
+      yaml.dump(self.concourse(), sys.stdout, allow_unicode=True)
+      # fly -t concourse-sapcloud-garden set-pipeline -c  test.yaml -p "create-cluster"
+    elif args.job: 
+      print(self.run_task(args.job,args.task))
+    else:
+      print(self.run())
 
 
-def create_shoot(cluster_name):
+pipeline = Pipeline("c21s",__file__)
+pipeline.resource("shalm",GitRepo("https://github.com/kramerul/shalm"))
+job = pipeline.job("create-cluster")
+shalm_dir = job.get("shalm")
+cluster_name = "xxx"
+
+@job.task("create_shoot")
+def create_shoot():
   print("Create cluster {}".format(cluster_name))
   return cluster_name
 
-def install_shalm(shalm_dir,create_cluster):
-  cluster_name = create_cluster()
-  print("Installing shalm {} into {}".format(shalm_dir,cluster_name))
+@job.task("install_shalm",credentials=["HOME"])
+def install_shalm(HOME=None):
+  print(HOME)
+  print("Installing shalm {} into {}".format(shalm_dir,create_shoot()))
   return "Hello"
 
-def pipeline():
-  p = Pipeline("c21s",__file__)
-  p.resource("shalm",GitRepo("https://github.com/kramerul/shalm"))
-  job = p.job("create-cluster")
-  shalm_dir = job.get("shalm")
-  task_create_cluster = job.task("create-shoot",lambda : create_shoot("xxx"))
-  job.task("install-shalm",lambda : install_shalm(shalm_dir,task_create_cluster))
-  return p
+pipeline.main()
 
-p = pipeline()
-
-
-
-parser = argparse.ArgumentParser(description='Python concourse interface')
-parser.add_argument('--job',help='name of the job to run')
-parser.add_argument('--task',help='name of the task to run')
-parser.add_argument('--concourse', dest='concourse', action='store_true', help='dump concourse')
-
-args = parser.parse_args()
-
-if args.concourse:
-  import yaml
-  yaml.dump(p.concourse(), sys.stdout, allow_unicode=True)
-  # fly -t concourse-sapcloud-garden set-pipeline -c  test.yaml -p "create-cluster"
-elif args.job: 
-  print(p.run_task(args.job,args.task))
-else:
-  print(p.run())
