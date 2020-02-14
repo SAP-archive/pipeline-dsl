@@ -13,7 +13,7 @@ import argparse
 CACHE_DIR = 'tasks'
 SCRIPT_DIR = 'scripts'
 class Task:
-  def __init__(self, name, jobname, timeout, image_resource,script,inputs,credentials):
+  def __init__(self, name, jobname, timeout, image_resource,script,inputs,secrets):
       self.name = name
       self.timeout = timeout
       self.config =  {
@@ -21,7 +21,7 @@ class Task:
         "image_resource": image_resource,
         "outputs": [ { "name" : CACHE_DIR} ],
         "inputs": [ { "name" : CACHE_DIR},  { "name" : SCRIPT_DIR} ] + list(map(lambda x: {"name": x}, inputs)) ,
-        "params": list(map(lambda x: { x : '(({}))'.format(x) }, credentials)),
+        "params": list(map(lambda kv: { kv[1] : '(({}))'.format(kv[1]) }, secrets.items())),
         "run" : {
           "path": "/usr/bin/python3",
           "args" : [ os.path.join(SCRIPT_DIR,os.path.basename(script)), "--job", jobname , "--task" , name ],
@@ -75,50 +75,60 @@ class GitRepo:
           "branch": "master",
       }
     }
-  def dir(self,name):
+  def get(self,name):
     return "~/workspace/" + name
 
 
 class GetTask:
-  def __init__(self, name,trigger,resource):
+  def __init__(self, name,trigger,passed):
     self.name = name
     self.trigger = trigger
-    self.resource = resource
+    self.passed = passed
   def concourse(self):
     return {
       "get": self.name,
       "trigger": self.trigger,
+      "passed": self.passed,
     }
 
+class ResourceChain:
+  def __init__(self,resource):
+    self.resource = resource
+    self.passed = []
 
 class Job:
-  def __init__(self, name, script,image_resource,resources):
+  def __init__(self, name, script,image_resource,resource_chains):
     self.name = name
     self.plan =  [ InitTask(script,image_resource)]
     self.last_task = None
     self.image_resource = image_resource
     self.script = script
-    self.resources = resources
+    self.resource_chains = resource_chains
     self.inputs = []
     self.tasks = {}
 
-  def get(self,name,trigger=False):
-    resource = self.resources[name]
-    self.plan.append(GetTask(name,trigger,resource))
+  def get(self,name,trigger=True,passed=None):
+    resource_chain = self.resource_chains[name]
+    if not passed:
+      passed = resource_chain.passed.copy()
+    self.plan.append(GetTask(name,trigger,passed))
+    resource_chain.passed.append(self.name)
     self.inputs.append(name)
-    return resource.dir(name)
+    return resource_chain.resource.get(name)
 
-  def task(self,name,timeout="5m",image_resource=None,resources=[],credentials=[]):
+  def task(self,name,timeout="5m",image_resource=None,resources=[],secrets={}):
     if  not image_resource:
       image_resource = self.image_resource
     def decorate(fun):
-      self.plan.append(Task(name,self.name,timeout,image_resource,self.script,self.inputs,credentials))
+      self.plan.append(Task(name,self.name,timeout,image_resource,self.script,self.inputs,secrets))
       cache_file = os.path.join(CACHE_DIR, self.name, name + ".json")
       def fn():
         print("Running: {}".format(name))
         kwargs = {}
-        for c in credentials:
-          kwargs[c] = os.getenv(c)
+        for kv in secrets.items():
+          kwargs[kv[0]] = os.getenv(kv[1])
+          if not kwargs[kv[0]]:
+            raise Exception('Secret not available as environment variable "{secret}"'.format(secret=kv[1]))
         result = fun(**kwargs)
         os.makedirs(os.path.dirname(cache_file), exist_ok=True)
         with open(cache_file,'w') as fd:
@@ -130,7 +140,11 @@ class Job:
           with open(cache_file,'r') as fd:
             return json.load(fd)
         except FileNotFoundError:
-          return fn()
+          try:
+            return fn()
+          except Exception as exc:
+            raise exc from None
+
       
       self.tasks[name] = fn
       self.last_task = fn_cached
@@ -154,7 +168,7 @@ class Pipeline():
   def __init__(self,name,script):
     self.jobs = []
     self.jobs_by_name = {}
-    self.resources = {}
+    self.resource_chains = {}
     self.name = name
     self.image_resource = {
       "type": "registry-image",
@@ -174,17 +188,17 @@ class Pipeline():
     self.jobs_by_name[job].run_task(task)
 
   def job(self,name):
-    result = Job(name,self.script,self.image_resource,self.resources)
+    result = Job(name,self.script,self.image_resource,self.resource_chains)
     self.jobs.append(result)
     self.jobs_by_name[name] = result
     return result
 
   def resource(self,name,resource):
-    self.resources[name] = resource
+    self.resource_chains[name] = ResourceChain(resource)
 
   def concourse(self):
     return {
-      "resources" : list(map(lambda kv: kv[1].concourse(kv[0]), self.resources.items())),
+      "resources" : list(map(lambda kv: kv[1].resource.concourse(kv[0]), self.resource_chains.items())),
       "jobs" : list(map(lambda x: x.concourse(), self.jobs)),
     }
   
@@ -217,11 +231,14 @@ def create_shoot():
   print("Create cluster {}".format(cluster_name))
   return cluster_name
 
-@job.task("install_shalm",credentials=["HOME"])
-def install_shalm(HOME=None):
-  print(HOME)
+@job.task("install_shalm",secrets={"home" : "HOME"})
+def install_shalm(home=None):
+  print(home)
   print("Installing shalm {} into {}".format(shalm_dir,create_shoot()))
   return "Hello"
+
+job = pipeline.job("test-cluster")
+shalm_dir = job.get("shalm")
 
 pipeline.main()
 
