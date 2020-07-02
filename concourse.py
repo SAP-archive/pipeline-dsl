@@ -174,6 +174,45 @@ class GitRepo:
     def get(self, name):
         return GitRepoResource(name)
 
+class DockerImageResource:
+    def __init__(self, name):
+        self.name = name
+
+    def __str__(self):
+        return self.name
+
+    def digest(self):
+        if concourse_context():
+            with open(os.path.join(self.name, "digest")) as f:
+                return f.read().strip()
+        return "latest"
+
+class DockerImage:
+    def __init__(self, repository, username=None, password=None):
+        self.repository = repository
+        self.username = username
+        self.password = password
+
+    def resource_type(self):
+        return None
+
+    def concourse(self, name):
+        result = {
+            "name": name,
+            "type": "docker-image",
+            "icon": "docker",
+            "source": {
+                "repository": self.repository,
+                "username": self.username,
+                "password": self.password,
+            }
+        }
+        return result
+
+    def get(self, name):
+        return DockerImageResource(name)
+    
+
 
 class GetTask:
     def __init__(self, name, trigger, passed):
@@ -246,6 +285,7 @@ class Job:
         self.plan.append(PutTask(name, params))
         resource_chain.passed.append(self.name)
         self.inputs.append(name)
+        return resource_chain.resource.get(name)
 
     def task(self, timeout="5m", image_resource=None, resources=[], secrets={}, outputs=[]):
         if not image_resource:
