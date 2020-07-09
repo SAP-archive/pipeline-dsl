@@ -174,6 +174,51 @@ class GitRepo:
     def get(self, name):
         return GitRepoResource(name)
 
+
+class GithubReleaseResource:
+    def __init__(self, name):
+        self.name = name
+
+    def __str__(self):
+        return self.name
+
+    def tag(self, default=None):
+        if concourse_context():
+            with open(os.path.join(self.name, "tag")) as f:
+                return f.read().strip()
+        return default
+
+
+class GithubRelease:
+    def __init__(self, owner, repo, access_token=None, pre_release=False, release=True):
+        self.owner = owner
+        self.repo = repo
+        self.access_token = access_token
+        self.pre_release = pre_release
+        self.release = release
+
+    def resource_type(self):
+        return None
+
+    def concourse(self, name):
+        result = {
+            "name": name,
+            "type": "github-release",
+            "icon": "github-circle",
+            "source": {
+                "owner": self.owner,
+                "repository": self.repo,
+                "access_token": self.access_token,
+                "pre_release": self.pre_release,
+                "release": self.release,
+            }
+        }
+        return result
+
+    def get(self, name):
+        return GithubReleaseResource(name)
+
+
 class DockerImageResource:
     def __init__(self, name):
         self.name = name
