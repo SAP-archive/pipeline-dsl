@@ -8,6 +8,7 @@ import base64
 import glob
 import argparse
 import inspect
+from collections import OrderedDict
 
 CACHE_DIR = 'tasks'
 SCRIPT_DIR = 'scripts'
@@ -42,13 +43,12 @@ class Task:
         cache_file = os.path.join(CACHE_DIR, jobname, name + ".json")
 
         def fn():
-            print("Running: {}".format(name))
+            print(f"Running: {name}")
             kwargs = {}
             for kv in secrets.items():
                 kwargs[kv[0]] = os.getenv(str(kv[1]))
                 if not kwargs[kv[0]] and not isinstance(kv[1], OptionalSecret):
-                    raise Exception(
-                        'Secret not available as environment variable "{secret}"'.format(secret=kv[1]))
+                    raise Exception(f'Secret not available as environment variable "{kv[1]}"')
             for out in outputs:
                 dir = out
                 if not concourse_context():
@@ -96,12 +96,10 @@ class InitTask:
         transform = []
         for dir in self.script_dirs:
             dir = os.path.abspath(dir)
-            transform.append(
-                "--transform 's|{dir}|{i}|g'".format(dir=dir, i=len(transform)))
+            transform.append(f"--transform 's|{dir}|{len(transform)}|g'")
             files = files + \
                 list(glob.glob(os.path.join(dir, '*.py'), recursive=True))
-        cmd = '{tar} cj --sort=name --mtime="UTC 2019-01-01" {transform} --owner=root:0 --group=root:0 -b 1 -P -f - {files}'.format(
-            tar=tar, transform=" ".join(transform), files=" ".join(files))
+        cmd = f'{tar} cj --sort=name --mtime="UTC 2019-01-01" {" ".join(transform)} --owner=root:0 --group=root:0 -b 1 -P -f - {" ".join(files)}'
         data = base64.b64encode(subprocess.check_output(
             cmd, shell=True)).decode("utf-8")
         return {
@@ -114,8 +112,7 @@ class InitTask:
                     "path": "/bin/bash",
                     "args": [
                         '-ceu',
-                        'echo "{data}" | base64 -d | tar -C {script_dir} -xjf -'.format(
-                            script_dir=SCRIPT_DIR, data=data),
+                        f'echo "{data}" | base64 -d | tar -C {SCRIPT_DIR} -xjf -',
                     ],
                 }
             }
@@ -303,12 +300,11 @@ class Job:
     def __init__(self, name, script, script_dirs, image_resource, resource_chains):
         self.name = name
         self.plan = [InitTask(script_dirs, image_resource)]
-        self.last_task = None
         self.image_resource = image_resource
         self.resource_chains = resource_chains
         self.script = script
         self.inputs = []
-        self.tasks = {}
+        self.tasks = OrderedDict()
 
     def __enter__(self):
         return self
@@ -339,8 +335,7 @@ class Job:
         def decorate(fun):
             task = Task(fun, self.name, timeout, image_resource, self.script, self.inputs, outputs, secrets)
             self.plan.append(task)
-            self.tasks[task.name] = task.fn
-            self.last_task = task.fn_cached
+            self.tasks[task.name] = task
             return task.fn_cached
         return decorate
 
@@ -351,13 +346,11 @@ class Job:
         }
 
     def run(self):
-        if self.last_task:
-            return self.last_task()
-        else:
-            return None
+        for k, v in self.tasks.items():
+            v.fn_cached()
 
     def run_task(self, name):
-        return self.tasks[name]()
+        return self.tasks[name].fn_cached()
 
 
 class Pipeline():
@@ -419,15 +412,22 @@ class Pipeline():
             description='Python concourse interface')
         parser.add_argument('--job', help='name of the job to run')
         parser.add_argument('--task', help='name of the task to run')
-        parser.add_argument('--concourse', dest='concourse',
-                            action='store_true', help='dump concourse')
+        parser.add_argument('--target', help='upload concourse yaml to the given target')
+        parser.add_argument('--dump', dest='dump',
+                            action='store_true', help='dump concourse yaml')
 
         args = parser.parse_args()
 
-        if args.concourse:
+        if args.dump:
             import yaml
             yaml.dump(self.concourse(), sys.stdout, allow_unicode=True)
             # fly -t concourse-sapcloud-garden set-pipeline -c  test.yaml -p "create-cluster"
+        elif args.target:
+            import yaml
+            config_file = f"/tmp/{self.name}.yaml"
+            with open(config_file,"w") as f:
+                yaml.dump(self.concourse(), f, allow_unicode=True)
+            subprocess.run(["fly", "-t", args.target, "set-pipeline", "-c", config_file, "-p", self.name, "-n"], check=True)
         elif args.job:
             print(self.run_task(args.job, args.task))
         else:
