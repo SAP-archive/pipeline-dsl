@@ -122,14 +122,16 @@ class InitTask:
 class GitRepoResource:
     def __init__(self, name):
         self.name = name
+        if concourse_context():
+            self.path = os.path.abspath(self.name)
+        else:
+            self.path = os.getenv("HOME") + "/workspace/" + self.name
 
     def __str__(self):
         return self.directory()
 
     def directory(self):
-        if concourse_context():
-            return self.name
-        return os.getenv("HOME") + "/workspace/" + self.name
+        return self.path
 
     def ref(self):
         if concourse_context():
@@ -175,13 +177,14 @@ class GitRepo:
 class GithubReleaseResource:
     def __init__(self, name):
         self.name = name
+        self.path = os.path.abspath(self.name)
 
     def __str__(self):
         return self.name
 
     def tag(self, default=None):
         if concourse_context():
-            with open(os.path.join(self.name, "tag")) as f:
+            with open(os.path.join(self.path, "tag")) as f:
                 return f.read().strip()
         return default
 
@@ -219,13 +222,14 @@ class GithubRelease:
 class DockerImageResource:
     def __init__(self, name):
         self.name = name
+        self.path = os.path.abspath(self.name)
 
     def __str__(self):
         return self.name
 
     def digest(self):
         if concourse_context():
-            with open(os.path.join(self.name, "digest")) as f:
+            with open(os.path.join(self.path, "digest")) as f:
                 return f.read().strip()
         return "latest"
 
