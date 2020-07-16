@@ -20,10 +20,11 @@ def concourse_context():
 
 
 class Task:
-    def __init__(self, fun, jobname, timeout, image_resource, script, inputs, outputs, secrets):
+    def __init__(self, fun, jobname, timeout, image_resource, script, inputs, outputs, secrets, attempts):
         name = fun.__name__
         self.name = name
         self.timeout = timeout
+        self.attempts = attempts
         self.config = {
             "platform": "linux",
             "image_resource": image_resource,
@@ -79,6 +80,7 @@ class Task:
             "task": self.name,
             "timeout": self.timeout,
             "config": self.config,
+            "attempts": self.attempts,
         }
 
 
@@ -332,12 +334,12 @@ class Job:
         self.inputs.append(name)
         return resource_chain.resource.get(name)
 
-    def task(self, timeout="5m", image_resource=None, resources=[], secrets={}, outputs=[]):
+    def task(self, timeout="5m", image_resource=None, resources=[], secrets={}, outputs=[], attempts=1):
         if not image_resource:
             image_resource = self.image_resource
 
         def decorate(fun):
-            task = Task(fun, self.name, timeout, image_resource, self.script, self.inputs, outputs, secrets)
+            task = Task(fun, self.name, timeout, image_resource, self.script, self.inputs, outputs, secrets, attempts)
             self.plan.append(task)
             self.tasks[task.name] = task
             return task.fn_cached
