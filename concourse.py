@@ -305,7 +305,7 @@ class ResourceChain:
 
 
 class Job:
-    def __init__(self, name, script, script_dirs, image_resource, resource_chains):
+    def __init__(self, name, script, script_dirs, image_resource, resource_chains, serial):
         self.name = name
         self.plan = [InitTask(script_dirs, image_resource)]
         self.image_resource = image_resource
@@ -313,6 +313,7 @@ class Job:
         self.script = script
         self.inputs = []
         self.tasks = OrderedDict()
+        self.serial = serial
 
     def __enter__(self):
         return self
@@ -350,7 +351,8 @@ class Job:
     def concourse(self):
         return {
             "name": self.name,
-            "plan": list(map(lambda x: x.concourse(), self.plan))
+            "plan": list(map(lambda x: x.concourse(), self.plan)),
+            "serial": self.serial
         }
 
     def run(self):
@@ -397,9 +399,9 @@ class Pipeline():
             raise Exception("Job " + job + " not found. List of available jobs: " +
                             " ".join(list(self.jobs_by_name.keys())))
 
-    def job(self, name):
+    def job(self, name, serial=False):
         result = Job(name, self.script, self.script_dirs, self.image_resource,
-                     self.resource_chains)
+                     self.resource_chains, serial=serial)
         self.jobs.append(result)
         self.jobs_by_name[name] = result
         return result
