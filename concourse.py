@@ -29,7 +29,7 @@ class Task:
             "image_resource": image_resource,
             "outputs": [{"name": CACHE_DIR}] + list(map(lambda x: {"name": x}, outputs)),
             "inputs": [{"name": CACHE_DIR},  {"name": SCRIPT_DIR}] + list(map(lambda x: {"name": x}, inputs)),
-            "params": {**dict(map(lambda kv: (str(kv[1]), '(({}))'.format(str(kv[1]))), secrets.items())),
+            "params": {**dict(map(lambda kv: (str(kv[0]), '(({}))'.format(str(kv[1]))), secrets.items())),
                        **{
                 "PYTHONPATH": SCRIPT_DIR + "/0:" + SCRIPT_DIR + "/1:" + SCRIPT_DIR + "/2:" + SCRIPT_DIR + "/3:",
                 "CONTEXT": CONCOURSE_CONTEXT,
