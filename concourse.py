@@ -236,10 +236,11 @@ class DockerImageResource:
         return "latest"
 
 class DockerImage:
-    def __init__(self, repository, username=None, password=None):
+    def __init__(self, repository, username=None, password=None, tag="latest"):
         self.repository = repository
         self.username = username
         self.password = password
+        self.tag = tag
 
     def resource_type(self):
         return None
@@ -253,6 +254,7 @@ class DockerImage:
                 "repository": self.repository,
                 "username": self.username,
                 "password": self.password,
+                "tag": self.tag
             }
         }
         return result
