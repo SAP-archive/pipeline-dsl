@@ -452,7 +452,7 @@ class Password:
         return self.password
 
 
-def shell(cmd, check=True, cwd=None):
+def shell(cmd, check=True, cwd=None, stdout=subprocess.PIPE, stderr=subprocess.PIPE):
     print(" ".join(
         list(map(lambda x: "<redacted>" if isinstance(x, Password) else str(x), cmd))))
-    return subprocess.run(list(map(lambda x: str(x), cmd)), check=check, cwd=cwd)
+    return subprocess.run(list(map(lambda x: str(x), cmd)), check=check, cwd=cwd, stdout=stdout, stderr=stderr)
