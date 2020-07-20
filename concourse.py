@@ -24,12 +24,12 @@ class ParallelTask:
         self.tasks = []
         self.fail_fast = fail_fast
 
-    def task(self, timeout="5m", image_resource=None, resources=[], secrets={}, outputs=[], attempts=1):
+    def task(self, timeout="5m", image_resource=None, resources=[], secrets={}, outputs=[], attempts=1, caches=[]):
         if not image_resource:
             image_resource = self.job.image_resource
 
         def decorate(fun):
-            task = Task(fun, self.job.name, timeout, image_resource, self.job.script, self.job.inputs, outputs, secrets, attempts)
+            task = Task(fun, self.job.name, timeout, image_resource, self.job.script, self.job.inputs, outputs, secrets, attempts, caches)
             self.tasks.append(task)
             self.job.tasks[task.name] = task
             return task.fn_cached
@@ -50,16 +50,18 @@ class ParallelTask:
         }
 
 class Task:
-    def __init__(self, fun, jobname, timeout, image_resource, script, inputs, outputs, secrets, attempts):
+    def __init__(self, fun, jobname, timeout, image_resource, script, inputs, outputs, secrets, attempts, caches):
         name = fun.__name__
         self.name = name
         self.timeout = timeout
         self.attempts = attempts
+        self.caches = caches
         self.config = {
             "platform": "linux",
             "image_resource": image_resource,
             "outputs": [{"name": CACHE_DIR}] + list(map(lambda x: {"name": x}, outputs)),
             "inputs": [{"name": CACHE_DIR},  {"name": SCRIPT_DIR}] + list(map(lambda x: {"name": x}, inputs)),
+            "caches": [{"path": cache} for cache in self.caches],
             "params": {**dict(map(lambda kv: (str(kv[1]), '(({}))'.format(str(kv[1]))), secrets.items())),
                        **{
                 "PYTHONPATH": SCRIPT_DIR + ":" + SCRIPT_DIR + "/py-cicd:" + "/usr/local/lib/python/garden-tools",
@@ -397,12 +399,12 @@ class Job:
         self.inputs.append(name)
         return resource_chain.resource.get(name)
 
-    def task(self, timeout="5m", image_resource=None, resources=[], secrets={}, outputs=[], attempts=1):
+    def task(self, timeout="5m", image_resource=None, resources=[], secrets={}, outputs=[], attempts=1, caches=[]):
         if not image_resource:
             image_resource = self.image_resource
 
         def decorate(fun):
-            task = Task(fun, self.name, timeout, image_resource, self.script, self.inputs, outputs, secrets, attempts)
+            task = Task(fun, self.name, timeout, image_resource, self.script, self.inputs, outputs, secrets, attempts, caches)
             self.plan.append(task)
             self.tasks[task.name] = task
             return task.fn_cached
