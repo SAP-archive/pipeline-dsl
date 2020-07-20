@@ -60,13 +60,13 @@ class Task:
             "inputs": [{"name": CACHE_DIR},  {"name": SCRIPT_DIR}] + list(map(lambda x: {"name": x}, inputs)),
             "params": {**dict(map(lambda kv: (str(kv[1]), '(({}))'.format(str(kv[1]))), secrets.items())),
                        **{
-                "PYTHONPATH": SCRIPT_DIR + "/0:" + SCRIPT_DIR + "/1:" + SCRIPT_DIR + "/2:" + SCRIPT_DIR + "/3:" + "/usr/local/lib/python/garden-tools",
+                "PYTHONPATH": SCRIPT_DIR + ":" + SCRIPT_DIR + "/py-cicd:" + "/usr/local/lib/python/garden-tools",
                 "CONTEXT": CONCOURSE_CONTEXT,
                 "REQUESTS_CA_BUNDLE": '/etc/ssl/certs/ca-certificates.crt'
             }},
             "run": {
                 "path": "/usr/bin/python3",
-                "args": [os.path.join(SCRIPT_DIR, "0", os.path.basename(script)), "--job", jobname, "--task", name],
+                "args": [os.path.join(SCRIPT_DIR, "concourse", os.path.basename(script)), "--job", jobname, "--task", name],
             }
         }
         cache_file = os.path.join(CACHE_DIR, jobname, name + ".json")
@@ -126,7 +126,7 @@ class InitTask:
         transform = []
         for dir in self.script_dirs:
             dir = os.path.abspath(dir)
-            transform.append(f"--transform 's|{dir}|{len(transform)}|g'")
+            transform.append(f"--transform 's|{dir}|{dir.split('/')[-1]}|g'")
             files = files + \
                 list(glob.glob(os.path.join(dir, '**', '*.[ps][yh]'), recursive=True))
         cmd = f'{tar} cj --sort=name --mtime="UTC 2019-01-01" {" ".join(transform)} --owner=root:0 --group=root:0 -b 1 -P -f - {" ".join(files)}'
@@ -427,12 +427,13 @@ class Job:
 
 
 class Pipeline():
-    def __init__(self, name, image_resource={"type": "registry-image", "source": {"repository": "python", "tag": "3.8-buster"}}):
+    def __init__(self, name, image_resource={"type": "registry-image", "source": {"repository": "python", "tag": "3.8-buster"}}, script_dirs=[]):
         frame = inspect.stack()[1]
         module = inspect.getmodule(frame[0])
         self.script = module.__file__
-        self.script_dirs = [os.path.dirname(
-            self.script), os.path.dirname(__file__)]
+        self.script_dirs = [os.path.dirname(self.script), os.path.dirname(__file__)]
+        for script in script_dirs:
+            self.script_dirs.append(os.path.realpath(script))
         self.jobs = []
         self.jobs_by_name = {}
         self.resource_chains = {}
