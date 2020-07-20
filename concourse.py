@@ -32,7 +32,7 @@ class Task:
             "inputs": [{"name": CACHE_DIR},  {"name": SCRIPT_DIR}] + list(map(lambda x: {"name": x}, inputs)),
             "params": {**dict(map(lambda kv: (str(kv[0]), '(({}))'.format(str(kv[1]))), secrets.items())),
                        **{
-                "PYTHONPATH": SCRIPT_DIR + "/0:" + SCRIPT_DIR + "/1:" + SCRIPT_DIR + "/2:" + SCRIPT_DIR + "/3" + os.environ["PYTHONPATH"],
+                "PYTHONPATH": SCRIPT_DIR + "/0:" + SCRIPT_DIR + "/1:" + SCRIPT_DIR + "/2:" + SCRIPT_DIR + "/3:" + "/usr/local/lib/python/garden-tools",
                 "CONTEXT": CONCOURSE_CONTEXT,
                 "REQUESTS_CA_BUNDLE": '/etc/ssl/certs/ca-certificates.crt'
             }},
