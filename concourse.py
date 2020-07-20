@@ -19,9 +19,10 @@ def concourse_context():
     return os.getenv("CONTEXT") == CONCOURSE_CONTEXT
 
 class ParallelTask:
-    def __init__(self, job):
+    def __init__(self, job, fail_fast):
         self.job = job
         self.tasks = []
+        self.fail_fast = fail_fast
 
     def task(self, timeout="5m", image_resource=None, resources=[], secrets={}, outputs=[], attempts=1):
         if not image_resource:
@@ -43,6 +44,7 @@ class ParallelTask:
     def concourse(self):
         return {
             "in_parallel": {
+                "fail_fast": self.fail_fast,
                 "steps": [task.concourse() for task in self.tasks]
             }
         }
@@ -406,8 +408,8 @@ class Job:
             return task.fn_cached
         return decorate
 
-    def in_parallel(self):
-        parallel_task = ParallelTask(self)
+    def in_parallel(self, fail_fast=False):
+        parallel_task = ParallelTask(self, fail_fast)
         self.plan.append(parallel_task)
         return parallel_task
 
