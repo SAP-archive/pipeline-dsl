@@ -41,6 +41,9 @@ class ParallelTask:
     def __exit__(self, type, value, tb):
         return None
 
+    def put(self, name, params=None):
+        self.tasks.append(PutTask(name, params))
+
     def concourse(self):
         return {
             "in_parallel": {
@@ -157,7 +160,7 @@ class GoogleCloudStorageResource:
         self.bucket = bucket
         self.regexp = regexp
         self.credentials = credentials
-    
+
     def resource_type(self):
         return {
             "name": "gcs",
