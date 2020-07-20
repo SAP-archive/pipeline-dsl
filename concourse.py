@@ -100,7 +100,7 @@ class InitTask:
             dir = os.path.abspath(dir)
             transform.append(f"--transform 's|{dir}|{len(transform)}|g'")
             files = files + \
-                list(glob.glob(os.path.join(dir, '*.py'), recursive=True))
+                list(glob.glob(os.path.join(dir, '**', '*.[ps][yh]'), recursive=True))
         cmd = f'{tar} cj --sort=name --mtime="UTC 2019-01-01" {" ".join(transform)} --owner=root:0 --group=root:0 -b 1 -P -f - {" ".join(files)}'
         data = base64.b64encode(subprocess.check_output(
             cmd, shell=True)).decode("utf-8")
