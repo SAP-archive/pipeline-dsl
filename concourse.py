@@ -18,6 +18,34 @@ CONCOURSE_CONTEXT = 'concourse'
 def concourse_context():
     return os.getenv("CONTEXT") == CONCOURSE_CONTEXT
 
+class ParallelTask:
+    def __init__(self, job):
+        self.job = job
+        self.tasks = []
+
+    def task(self, timeout="5m", image_resource=None, resources=[], secrets={}, outputs=[], attempts=1):
+        if not image_resource:
+            image_resource = self.job.image_resource
+
+        def decorate(fun):
+            task = Task(fun, self.job.name, timeout, image_resource, self.job.script, self.job.inputs, outputs, secrets, attempts)
+            self.tasks.append(task)
+            self.job.tasks[task.name] = task
+            return task.fn_cached
+        return decorate
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, type, value, tb):
+        return None
+
+    def concourse(self):
+        return {
+            "in_parallel": {
+                "steps": [task.concourse() for task in self.tasks]
+            }
+        }
 
 class Task:
     def __init__(self, fun, jobname, timeout, image_resource, script, inputs, outputs, secrets, attempts):
@@ -348,6 +376,11 @@ class Job:
             return task.fn_cached
         return decorate
 
+    def in_parallel(self):
+        parallel_task = ParallelTask(self)
+        self.plan.append(parallel_task)
+        return parallel_task
+
     def concourse(self):
         return {
             "name": self.name,
@@ -452,7 +485,7 @@ class Password:
         return self.password
 
 
-def shell(cmd, check=True, cwd=None, stdout=subprocess.PIPE, stderr=subprocess.PIPE):
+def shell(cmd, check=True, cwd=None, capture_output=False):
     print(" ".join(
         list(map(lambda x: "<redacted>" if isinstance(x, Password) else str(x), cmd))))
-    return subprocess.run(list(map(lambda x: str(x), cmd)), check=check, cwd=cwd, stdout=stdout, stderr=stderr)
+    return subprocess.run(list(map(lambda x: str(x), cmd)), check=check, cwd=cwd, capture_output=capture_output)
