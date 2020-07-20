@@ -321,9 +321,9 @@ class Job:
     def __exit__(self, type, value, tb):
         return None
 
-    def get(self, name, trigger=False, passed=None):
+    def get(self, name, trigger=False, passed="auto"):
         resource_chain = self.resource_chains[name]
-        if not passed:
+        if passed == "auto":
             passed = resource_chain.passed.copy()
         self.plan.append(GetTask(name, trigger, passed))
         resource_chain.passed.append(self.name)
