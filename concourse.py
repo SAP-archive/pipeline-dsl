@@ -24,12 +24,12 @@ class ParallelTask:
         self.tasks = []
         self.fail_fast = fail_fast
 
-    def task(self, timeout="5m", image_resource=None, resources=[], secrets={}, outputs=[], attempts=1, caches=[]):
+    def task(self, timeout="5m", privileged=False, image_resource=None, resources=[], secrets={}, outputs=[], attempts=1, caches=[]):
         if not image_resource:
             image_resource = self.job.image_resource
 
         def decorate(fun):
-            task = Task(fun, self.job.name, timeout, image_resource, self.job.script, self.job.inputs, outputs, secrets, attempts, caches)
+            task = Task(fun, self.job.name, timeout, privileged, image_resource, self.job.script, self.job.inputs, outputs, secrets, attempts, caches)
             self.tasks.append(task)
             self.job.tasks[task.name] = task
             return task.fn_cached
@@ -53,10 +53,11 @@ class ParallelTask:
         }
 
 class Task:
-    def __init__(self, fun, jobname, timeout, image_resource, script, inputs, outputs, secrets, attempts, caches):
+    def __init__(self, fun, jobname, timeout, privileged, image_resource, script, inputs, outputs, secrets, attempts, caches):
         name = fun.__name__
         self.name = name
         self.timeout = timeout
+        self.privileged = privileged
         self.attempts = attempts
         self.caches = caches
         self.config = {
@@ -114,6 +115,7 @@ class Task:
         return {
             "task": self.name,
             "timeout": self.timeout,
+            "privileged": self.privileged,
             "config": self.config,
             "attempts": self.attempts,
         }
@@ -416,6 +418,8 @@ class Job:
         self.inputs = []
         self.tasks = OrderedDict()
         self.serial = serial
+        self.on_failure = None
+        self.on_abort = None
 
     def __enter__(self):
         return self
@@ -439,12 +443,12 @@ class Job:
         self.inputs.append(name)
         return resource_chain.resource.get(name)
 
-    def task(self, timeout="5m", image_resource=None, resources=[], secrets={}, outputs=[], attempts=1, caches=[]):
+    def task(self, timeout="5m", privileged=False, image_resource=None, resources=[], secrets={}, outputs=[], attempts=1, caches=[]):
         if not image_resource:
             image_resource = self.image_resource
 
         def decorate(fun):
-            task = Task(fun, self.name, timeout, image_resource, self.script, self.inputs, outputs, secrets, attempts, caches)
+            task = Task(fun, self.name, timeout, privileged, image_resource, self.script, self.inputs, outputs, secrets, attempts, caches)
             self.plan.append(task)
             self.tasks[task.name] = task
             return task.fn_cached
@@ -456,11 +460,16 @@ class Job:
         return parallel_task
 
     def concourse(self):
-        return {
+        obj = {
             "name": self.name,
             "plan": list(map(lambda x: x.concourse(), self.plan)),
             "serial": self.serial
         }
+        if self.on_failure:
+            obj['on_failure'] = self.on_failure.concourse()
+        if self.on_abort:
+            obj['on_abort'] = self.on_abort.concourse()
+        return obj
 
     def run(self):
         for k, v in self.tasks.items():
