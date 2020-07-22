@@ -471,7 +471,7 @@ class Job:
 
 
 class Pipeline():
-    def __init__(self, name, image_resource={"type": "registry-image", "source": {"repository": "python", "tag": "3.8-buster"}}, script_dirs=[]):
+    def __init__(self, name, image_resource={"type": "registry-image", "source": {"repository": "python", "tag": "3.8-buster"}}, script_dirs=[], team="main"):
         frame = inspect.stack()[1]
         module = inspect.getmodule(frame[0])
         self.script = module.__file__
@@ -484,6 +484,7 @@ class Pipeline():
         self.resource_types = {}
         self.name = name
         self.image_resource = image_resource
+        self.team = team
 
     def path_append(self, dir):
         self.script_dirs.append(dir)
@@ -520,6 +521,10 @@ class Pipeline():
 
     def concourse(self):
         return {
+            "pipeline_metadata": {
+                "name": self.name,
+                "team": self.team,
+            },
             "resource_types": list(filter(lambda x: x, map(lambda kv: kv[1].resource_type(), self.resource_types.items()))),
             "resources": list(map(lambda kv: kv[1].resource.concourse(kv[0]), self.resource_chains.items())),
             "jobs": list(map(lambda x: x.concourse(), self.jobs)),
