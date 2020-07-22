@@ -393,6 +393,14 @@ class PutTask:
             "params": self.params,
         }
 
+class TryTask:
+    def __init__(self, task):
+        self.task = task
+
+    def concourse(self):
+        return {
+            "try": self.task.concourse()
+        }
 
 class OptionalSecret:
     def __init__(self, name):
@@ -420,6 +428,7 @@ class Job:
         self.serial = serial
         self.on_failure = None
         self.on_abort = None
+        self.ensure = None
 
     def __enter__(self):
         return self
@@ -469,6 +478,8 @@ class Job:
             obj['on_failure'] = self.on_failure.concourse()
         if self.on_abort:
             obj['on_abort'] = self.on_abort.concourse()
+        if self.ensure:
+            obj['ensure'] = self.ensure.concourse()
         return obj
 
     def run(self):
