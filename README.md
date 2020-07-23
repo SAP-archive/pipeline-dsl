@@ -1,12 +1,22 @@
-# py-cicd
+# Pypeline
 
-Python DSL fon [concourse](https://concourse-ci.org/)
+Python DSL for [concourse](https://concourse-ci.org/)
 
+
+## Installation
+
+Currently, there is no pypi repository avaialable within SAP. Therefore, installation must be done manually
+
+```bash
+git clone https://github.tools.sap/cki/pypeline.git
+cd pypeline
+make install
+```
 
 ## Example
 
 ```python
-from concourse import Pipeline, GitRepo
+from pypeline import Pipeline, GitRepo
 
 with Pipeline("c21s", __file__) as pipeline:
     pipeline.resource("shalm", GitRepo("https://github.com/wonderix/shalm"))
