@@ -36,6 +36,7 @@ class ConcourseLockResource:
         result = {
             "name": name,
             "type": "pool_stable",
+            "icon": "lock",
             "source": {
                 "uri": self.uri,
                 "branch": self.branch,
@@ -119,6 +120,7 @@ class GitRepo:
         result = {
             "name": name,
             "type": "git",
+            "icon": "git",
             "source": {
                 "uri": self.uri,
                 "branch": self.branch,
@@ -164,7 +166,7 @@ class GithubRelease:
         result = {
             "name": name,
             "type": "github-release",
-            "icon": "github-circle",
+            "icon": "github",
             "source": {
                 "owner": self.owner,
                 "repository": self.repo,
@@ -238,6 +240,7 @@ class Cron:
         return {
             "name": name,
             "type": "cron",
+            "icon": "clock-outline",
             "source": {
                 "cron": self.definition,
                 "location": "Europe/Berlin",
