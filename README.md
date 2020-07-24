@@ -21,25 +21,19 @@ from pypeline import Pipeline, GitRepo
 with Pipeline("c21s", __file__) as pipeline:
     pipeline.resource("shalm", GitRepo("https://github.com/wonderix/shalm"))
     with pipeline.job("create-cluster") as job:
-        shalm_dir = job.get("shalm")
-        cluster_name = "xxx"
-
+        shalm = job.get("shalm")
+        cluster_name = "test"
 
         @job.task()
         def create_shoot():
-            print("Create cluster {}".format(cluster_name))
+            print(f"Create cluster {cluster_name}")
             return cluster_name
-
 
         @job.task(secrets={"home": "HOME"})
         def install_shalm(home=None):
             print("HOME=" + home)
-            print("Installing shalm {} into {}".format(shalm_dir, create_shoot()))
+            print(f"Installing shalm {shalm.path} into {create_shoot()}")
             return "Hello"
-
-
-        job = pipeline.job("test-cluster")
-        shalm_dir = job.get("shalm")
 ```
 
 
@@ -56,11 +50,27 @@ python <pipeline> --job <job> --task <task>
 In this case 
 * all repositories are expected to be located in `$HOME/workspace/<resourcename>`
 * all secrets are set as environment variable
-* no put actions are executed
+* no get actions on resources are executed
+* no put actions on resources are executed
 
 ### Handling of paths
 
 #### Repositories
+
+To get access to a repository, you need to do the following
+* declare the repository as pipeline resource
+* use `resource = job.get` to clone it into you workspace
+* use `resource.path` to get the location of the repository inside you workspace
+
+```
+pipeline.resource("shalm", GitRepo("https://github.com/wonderix/shalm"))
+with pipeline.job("create-cluster") as job:
+    resource = job.get("resource")
+
+    @job.task()
+    def my_task():
+        print(resource.path)
+```
 
 #### Outputs
 
@@ -86,3 +96,16 @@ In a local environment the secret values are taken from environment variables.
 def mytask(home=None):
     print("SECRET=" + secret)
 ```
+
+### Reusing code
+
+#### Using libraries
+
+#### Loading code from repositories
+
+#### Using ci-cd image
+
+
+### Calling other tasks
+
+This feature is currently not available
