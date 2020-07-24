@@ -112,13 +112,16 @@ class Task:
 
 
     def concourse(self):
-        return {
+        concourse = {
             "task": self.name,
             "timeout": self.timeout,
             "privileged": self.privileged,
             "config": self.config,
-            "attempts": self.attempts,
         }
+        if self.attempts != 1:
+            # explicitly setting attempts to 1 add clutter to the concourse UI
+            concourse["attempts"] = self.attempts
+        return concourse
 
 
 class InitTask:
