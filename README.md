@@ -41,3 +41,48 @@ with Pipeline("c21s", __file__) as pipeline:
         job = pipeline.job("test-cluster")
         shalm_dir = job.get("shalm")
 ```
+
+
+## Users Guide
+
+### Local execution
+
+It's possible to execute each task locally
+
+```
+python <pipeline> --job <job> --task <task>
+```
+
+In this case 
+* all repositories are expected to be located in `$HOME/workspace/<resourcename>`
+* all secrets are set as environment variable
+* no put actions are executed
+
+### Handling of paths
+
+#### Repositories
+
+#### Outputs
+
+You can use output folders for your tasks. Therefore, you can use the `outputs` parameter passed to the `task` decoration. For each declared output, a parameter is passed to your task function. You should use this parameter get the location of the output folder.
+
+In a local environment, this folder will be located in `/tmp/outputs/<job>/<output>`. If running inside concourse, this path will be located inside your workspace.
+
+```
+@job.task(outputs=["out"])
+def tag(out):
+    with open(os.path.join(out,"tag"), "w") as file:
+      file.write("stable-" + datetime.now().isoformat('T'))
+```
+
+### Using secret manager
+
+You can use values provided by the concourse secret manager as input variable to you task function. Therefore, you can pass the `secrets` parameter to the `task` decorator. Inside the `secret` parameter you can pass the name of the passed parameter as key and the name of the secret as value.
+
+In a local environment the secret values are taken from environment variables.
+
+```
+@job.task(secrets={"secret": "SECRET"})
+def mytask(home=None):
+    print("SECRET=" + secret)
+```

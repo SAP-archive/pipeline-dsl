@@ -89,7 +89,7 @@ class Task:
             for out in outputs:
                 dir = out
                 if not concourse_context():
-                    dir = os.path.join("/tmp", self.name, name, out)
+                    dir = os.path.join("/tmp", "outputs", jobname, out)
                 os.makedirs(dir, exist_ok=True)
                 kwargs[out] = dir
             result = fun(**kwargs)
@@ -272,11 +272,20 @@ class Job:
             obj['ensure'] = self.ensure.concourse()
         return obj
 
+    def __cleanup_outputs(self):
+        if not concourse_context():
+            try:
+                shutil.rmtree(os.path.join("/tmp", "outputs", self.name))
+            except FileNotFoundError:
+                pass
+
     def run(self):
+        self.__cleanup_outputs()
         for k, v in self.tasks.items():
             v.fn_cached()
 
     def run_task(self, name):
+        self.__cleanup_outputs()
         return self.tasks[name].fn_cached()
 
 
