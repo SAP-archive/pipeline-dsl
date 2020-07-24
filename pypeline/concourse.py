@@ -162,17 +162,21 @@ class InitTask:
 
 
 class GetTask:
-    def __init__(self, name, trigger, passed):
+    def __init__(self, name, trigger, passed, params):
         self.name = name
         self.trigger = trigger
         self.passed = passed
+        self.params = params
 
     def concourse(self):
-        return {
+        result = {
             "get": self.name,
             "trigger": self.trigger,
             "passed": self.passed,
         }
+        if self.params != None:
+            result["params"] = self.params
+        return result
 
 
 class PutTask:
@@ -229,11 +233,11 @@ class Job:
     def __exit__(self, type, value, tb):
         return None
 
-    def get(self, name, trigger=False, passed="auto"):
+    def get(self, name, trigger=False, passed="auto", params=None):
         resource_chain = self.resource_chains[name]
         if passed == "auto":
             passed = resource_chain.passed.copy()
-        self.plan.append(GetTask(name, trigger, passed))
+        self.plan.append(GetTask(name, trigger, passed, params))
         resource_chain.passed.append(self.name)
         self.inputs.append(name)
         return resource_chain.resource.get(name)
