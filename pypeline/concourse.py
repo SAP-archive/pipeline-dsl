@@ -108,7 +108,7 @@ class Task:
                 except Exception as exc:
                     raise exc from None
         self.fn = fn
-        self.fn_cached = fn_cached
+        self.fn_cached = fn # fn_cached
 
 
     def concourse(self):
