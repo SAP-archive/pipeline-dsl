@@ -103,6 +103,12 @@ class GitRepoResource:
         except:
             return subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=self.directory()).decode("utf-8").strip()
 
+    def short_ref(self):
+        if concourse_context():
+            with open(os.path.join(self.directory(), ".git/short_ref")) as f:
+                return f.read().strip()
+        return subprocess.check_output(["git", "rev-parse", "--short", "HEAD"], cwd=self.directory()).decode("utf-8").strip()
+
 
 class GitRepo:
     def __init__(self, uri, username=None, password=None, branch="master", ignore_paths=None, tag_filter=None):
