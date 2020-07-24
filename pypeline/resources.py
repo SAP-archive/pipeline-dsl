@@ -158,12 +158,14 @@ class GithubReleaseResource:
 
 
 class GithubRelease:
-    def __init__(self, owner, repo, access_token=None, pre_release=False, release=True):
+    def __init__(self, owner, repo, access_token=None, pre_release=False, release=True, github_api_url=None, github_uploads_url=None):
         self.owner = owner
         self.repo = repo
         self.access_token = access_token
         self.pre_release = pre_release
         self.release = release
+        self.github_api_url = github_api_url
+        self.github_uploads_url = github_uploads_url
 
     def resource_type(self):
         return None
@@ -181,6 +183,10 @@ class GithubRelease:
                 "release": self.release,
             }
         }
+        if self.github_api_url != None:
+            result["source"]["github_api_url"] = self.github_api_url
+        if self.github_uploads_url != None:
+            result["source"]["github_uploads_url"] = self.github_uploads_url
         return result
 
     def get(self, name):
