@@ -105,6 +105,9 @@ def mytask(home=None):
 
 #### Using ci-cd image
 
+### Passing resources
+
+It resources are used by different jobs within the same pipeline, `pypeline` automatically adds the required `passed` setting on the resource. It's possible to override this behaviour by explicitly setting the `passed` attribute inside a call to `job.get(...,passed=[...])`
 
 ### Calling other tasks
 
