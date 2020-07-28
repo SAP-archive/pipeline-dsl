@@ -68,7 +68,7 @@ class Task:
             "caches": [{"path": cache} for cache in self.caches],
             "params": {**dict(map(lambda kv: (str(kv[1]), '(({}))'.format(str(kv[1]))), secrets.items())),
                        **{
-                "PYTHONPATH": SCRIPT_DIR + ":" + SCRIPT_DIR + "/py-cicd:" + "/usr/local/lib/python/garden-tools",
+                "PYTHONPATH": SCRIPT_DIR + ":" + SCRIPT_DIR + "/pypeline:" + "/usr/local/lib/python/garden-tools",
                 "CONTEXT": CONCOURSE_CONTEXT,
                 "REQUESTS_CA_BUNDLE": '/etc/ssl/certs/ca-certificates.crt'
             }},
