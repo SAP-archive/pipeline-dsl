@@ -392,6 +392,8 @@ class Password:
 
 
 def shell(cmd, check=True, cwd=None, capture_output=False):
+    stdout = stderr = subprocess.PIPE if capture_output else None
+
     print(" ".join(
         list(map(lambda x: "<redacted>" if isinstance(x, Password) else str(x), cmd))))
-    return subprocess.run(list(map(lambda x: str(x), cmd)), check=check, cwd=cwd, capture_output=capture_output)
+    return subprocess.run(list(map(lambda x: str(x), cmd)), check=check, cwd=cwd, stdout=stdout, stderr=stderr)
