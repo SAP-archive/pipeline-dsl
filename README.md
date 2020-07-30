@@ -18,7 +18,7 @@ make install
 ```python
 from pypeline import Pipeline, GitRepo
 
-with Pipeline("c21s", __file__) as pipeline:
+with Pipeline("c21s") as pipeline:
     pipeline.resource("shalm", GitRepo("https://github.com/wonderix/shalm"))
     with pipeline.job("create-cluster") as job:
         shalm = job.get("shalm")
