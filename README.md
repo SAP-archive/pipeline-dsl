@@ -36,6 +36,7 @@ with Pipeline("c21s") as pipeline:
             return "Hello"
 ```
 
+More details about the dsl can be found [here](/doc/dsl.md). For all (currently) available resources check [this](/doc/resources.md).
 
 ## Users Guide
 
