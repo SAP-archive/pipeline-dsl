@@ -18,10 +18,11 @@ class Pipeline():
         frame = inspect.stack()[1]
         module = inspect.getmodule(frame[0])
         self.script = module.__file__
-        self.py_dirs = [os.path.dirname(self.script), os.path.dirname(os.path.dirname(os.path.dirname(__file__)))]
+        dirname = os.path.dirname(self.script)
+        self.py_dirs = [dirname, os.path.dirname(os.path.dirname(os.path.dirname(__file__)))]
         self.script_dirs = []
         for script in script_dirs:
-            self.script_dirs.append(os.path.realpath(script))
+            self.script_dirs.append(os.path.realpath(os.path.join(dirname,script)))
         self.jobs = []
         self.jobs_by_name = {}
         self.resource_chains = {}
