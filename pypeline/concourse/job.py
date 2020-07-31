@@ -10,8 +10,8 @@ import glob
 import inspect
 from collections import OrderedDict
 
-from __shared import concourse_context
-from task import InitTask, Task
+from .__shared import concourse_context
+from .task import InitTask, Task
 
 
 class Job:

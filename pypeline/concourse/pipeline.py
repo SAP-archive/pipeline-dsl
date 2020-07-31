@@ -10,8 +10,8 @@ import glob
 import inspect
 from collections import OrderedDict
 
-from __shared import CACHE_DIR
-from job import Job
+from .__shared import CACHE_DIR
+from .job import Job
 
 class Pipeline():
     def __init__(self, name, image_resource={"type": "registry-image", "source": {"repository": "python", "tag": "3.8-buster"}}, script_dirs=[], team="main"):

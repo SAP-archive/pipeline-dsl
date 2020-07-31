@@ -9,7 +9,7 @@ import glob
 import inspect
 from collections import OrderedDict
 
-from __shared import CACHE_DIR, CONCOURSE_CONTEXT, SCRIPT_DIR, concourse_context
+from .__shared import CACHE_DIR, CONCOURSE_CONTEXT, SCRIPT_DIR, concourse_context
 
 class Task:
     def __init__(self, fun, jobname, timeout, privileged, image_resource, script, inputs, outputs, secrets, attempts, caches):
