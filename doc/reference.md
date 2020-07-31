@@ -1,7 +1,11 @@
-# Resources
+# Reference
+
+This document is a reference of all provided classes
+
+## Resources
 
 
-## Cron
+### Cron
 
 Upstream resource documentation: https://gitlab.com/phil9909/concourse-cron-resource/-/blob/master/README.md
 
@@ -14,7 +18,7 @@ Cron("0 0 4 * * *")
 ```
 
 
-## DockerImage
+### DockerImage
 
 Upstream resource documentation: https://github.com/concourse/docker-image-resource/blob/master/README.md
 
@@ -34,7 +38,7 @@ After `get`ting the resource the following methods are available:
 | `digest()` | the pulled image digest                          | "latest"       |
 
 
-## GoogleCloudStorageResource
+### GoogleCloudStorageResource
 
 Upstream resource documentation: https://github.com/frodenas/gcs-resource/blob/master/README.md
 
@@ -46,7 +50,7 @@ GoogleCloudStorageResource("my-bucket", "(.*).txt", "((MY_GCS_CREDENTIALS))")
 ```
 
 
-## GitRepo
+### GitRepo
 
 Upstream resource documentation: https://github.com/concourse/git-resource/blob/master/README.md
 
@@ -68,7 +72,7 @@ After `get`ting the resource the following methods are available:
 | `short_ref()` | see upstream documentation                       | result of `git rev-parse --short HEAD`                                  |
 
 
-## GithubRelease
+### GithubRelease
 
 Upstream resource documentation: https://github.com/concourse/github-release-resource/blob/master/README.md
 
@@ -88,7 +92,7 @@ After `get`ting the resource the following methods are available:
 | `tag(default=None)` | see upstream documentation                       | the `default` value passed to the method |
 
 
-## ConcourseLockResource
+### ConcourseLockResource
 
 Upstream resource documentation: https://github.com/concourse/pool-resource/blob/master/README.md
 
@@ -100,7 +104,7 @@ ConcourseLockResource("https://github.com/concourse/locks", username="((GITHUB_U
 ```
 
 
-## SemVer
+### SemVer
 
 Upstream resource documentation: https://github.com/concourse/semver-resource/blob/master/README.md
 
