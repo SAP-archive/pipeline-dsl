@@ -18,7 +18,8 @@ class Pipeline():
         frame = inspect.stack()[1]
         module = inspect.getmodule(frame[0])
         self.script = module.__file__
-        self.script_dirs = [os.path.dirname(self.script), os.path.dirname(__file__)]
+        self.py_dirs = [os.path.dirname(self.script), os.path.dirname(os.path.dirname(os.path.dirname(__file__)))]
+        self.script_dirs = []
         for script in script_dirs:
             self.script_dirs.append(os.path.realpath(script))
         self.jobs = []
@@ -30,7 +31,7 @@ class Pipeline():
         self.team = team
 
     def path_append(self, dir):
-        self.script_dirs.append(dir)
+        self.py_dirs.append(dir)
         sys.path.append(dir)
 
     def __enter__(self):
@@ -52,7 +53,7 @@ class Pipeline():
                             " ".join(list(self.jobs_by_name.keys())))
 
     def job(self, name, serial=False):
-        result = Job(name, self.script, self.script_dirs, self.image_resource,
+        result = Job(name, self.script, self.script_dirs, self.py_dirs, self.image_resource,
                      self.resource_chains, serial=serial)
         self.jobs.append(result)
         self.jobs_by_name[name] = result

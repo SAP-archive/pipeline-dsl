@@ -27,13 +27,13 @@ class Task:
             "caches": [{"path": cache} for cache in self.caches],
             "params": {**dict(map(lambda kv: (str(kv[1]), '(({}))'.format(str(kv[1]))), secrets.items())),
                        **{
-                "PYTHONPATH": SCRIPT_DIR + ":" + SCRIPT_DIR + "/py-cicd:" + "/usr/local/lib/python/garden-tools",
+                "PYTHONPATH": ":".join(list(map(lambda x: SCRIPT_DIR + f"/py{x}", [0,1,2,3,4,5,6,7,8,9]))) + ":/usr/local/lib/python/garden-tools",
                 "CONTEXT": CONCOURSE_CONTEXT,
                 "REQUESTS_CA_BUNDLE": '/etc/ssl/certs/ca-certificates.crt'
             }},
             "run": {
                 "path": "/usr/bin/python3",
-                "args": [os.path.join(SCRIPT_DIR, "concourse", os.path.basename(script)), "--job", jobname, "--task", name],
+                "args": [os.path.join(SCRIPT_DIR, "py0", os.path.basename(script)), "--job", jobname, "--task", name],
             }
         }
         cache_file = os.path.join(CACHE_DIR, jobname, name + ".json")
@@ -84,8 +84,9 @@ class Task:
 
 
 class InitTask:
-    def __init__(self, script_dirs, image_resource):
+    def __init__(self, script_dirs, py_dirs, image_resource):
         self.script_dirs = script_dirs
+        self.py_dirs = py_dirs
         self.image_resource = image_resource
 
     def concourse(self):
@@ -95,6 +96,12 @@ class InitTask:
             tar = "tar"
         files = []
         transform = []
+        for dir in self.py_dirs:
+            dir = os.path.abspath(dir)
+            # this is necessary to avoid name collisions
+            transform.append(f"--transform 's|{dir}|py{len(transform)}|g'")
+            files = files + \
+                list(glob.glob(os.path.join(dir, '**', '*.py'), recursive=True))
         for dir in self.script_dirs:
             dir = os.path.abspath(dir)
             transform.append(f"--transform 's|{dir}|{dir.split('/')[-1]}|g'")
