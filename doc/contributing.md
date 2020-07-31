@@ -162,5 +162,8 @@ We've found that test-first development really helps make features better
 architected and identifies potential edge cases earlier instead of later.
 Writing tests before the implementation is strongly encouraged.
 
-Also ensure that the examples in the `examples` folder are still working.
+Run tests
+---------
+
+Use `make test` to ensure that everything is working fine.
 

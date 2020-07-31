@@ -52,7 +52,7 @@ In a local environment the secret values are taken from environment variables.
 
 
 ## Resources
-To specify resources used in a pipeline, you'll have to specify them in the according pipeline's block. A complete working example can be found [here](../examples/resources.py)
+To specify resources used in a pipeline, you'll have to specify them in the according pipeline's block. A complete working example can be found [here](../examples/resource.py)
 
 ```python
 with Pipeline("kubernetes") as pipeline:
@@ -129,15 +129,15 @@ In this case
 * no put actions on resources are executed
 
 
-### Reusing code
+## Reusing code
 
-#### Using libraries
+### Using libraries
 
 You can use `pipeline.path_append(dir)` to package a library within your pipeline. This command 
 * includes all `*.py` files from the specified directory to the pipeline
 * sets the system path `sys.path.append(dir)` in a way that this path will be searched automatically.
 
-#### Loading code from repositories
+### Loading code from repositories
 
 You can also put the code into a separate repository and load this code at runtime using `sys.path.append(dir)`
 
@@ -152,7 +152,7 @@ with pipeline.job("mylib-job") as job:
 ```
 
 
-#### Using ci-cd image
+### Using ci-cd image
 
 You can also package the code you would like to reuse into you cicd-image (e.g. using pip). You can specify the cicd-image which should be used for each pipeline, job or task.
 
