@@ -1,6 +1,6 @@
 from contextlib import contextmanager
-
-
+from pypeline.concourse.__shared import concourse_context
+from pypeline.shell import shell
 
 @contextmanager
 def docker_daemon():
