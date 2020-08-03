@@ -35,7 +35,9 @@ class Job:
         return None
 
     def get(self, name, trigger=False, passed="auto", params=None):
-        resource_chain = self.resource_chains[name]
+        resource_chain = self.resource_chains.get(name,None)
+        if not resource_chain:
+            raise Exception("Resource " + name + " not configured for pipeline")
         if passed == "auto":
             passed = resource_chain.passed.copy()
         self.plan.append(GetStep(name, trigger, passed, params))
@@ -44,7 +46,9 @@ class Job:
         return resource_chain.resource.get(name)
 
     def put(self, name, params=None):
-        resource_chain = self.resource_chains[name]
+        resource_chain = self.resource_chains.get(name,None)
+        if not resource_chain:
+            raise Exception("Resource " + name + " not configured for pipeline")
         self.plan.append(PutStep(name, params))
         resource_chain.passed.append(self.name)
         self.inputs.append(name)

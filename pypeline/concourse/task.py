@@ -101,7 +101,7 @@ class InitTask:
             # this is necessary to avoid name collisions
             transform.append(f"--transform 's|{dir}|py{len(transform)}|g'")
             files = files + \
-                list(glob.glob(os.path.join(dir, '**', '*.py'), recursive=True))
+                list(glob.glob(os.path.join(dir, '**', '*.[ps][yh]'), recursive=True))
         for dir in self.script_dirs:
             dir = os.path.abspath(dir)
             transform.append(f"--transform 's|{dir}|{dir.split('/')[-1]}|g'")
