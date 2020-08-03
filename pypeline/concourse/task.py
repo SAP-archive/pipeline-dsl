@@ -49,6 +49,8 @@ class Task:
                 dir = out
                 if not concourse_context():
                     dir = os.path.join("/tmp", "outputs", jobname, out)
+                else:
+                    dir = os.path.abspath(out)
                 os.makedirs(dir, exist_ok=True)
                 kwargs[out] = dir
             result = fun(**kwargs)
