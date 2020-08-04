@@ -32,7 +32,7 @@ class GitRepoResource:
 
 
 class GitRepo:
-    def __init__(self, uri, username=None, password=None, branch="master", ignore_paths=None, tag_filter=None):
+    def __init__(self, uri, username=None, password=None, branch=None, ignore_paths=None, tag_filter=None):
         self.uri = uri
         self.username = username
         self.password = password
@@ -50,7 +50,7 @@ class GitRepo:
             "icon": "git",
             "source": {
                 "uri": self.uri,
-                "branch": self.branch,
+                **({"branch": self.branch} if self.branch is not None else {}),
                 **({"username": self.username} if self.username is not None else {}),
                 **({"password": self.password} if self.password is not None else {}),
                 **({"ignore_paths": self.ignore_paths} if self.ignore_paths is not None else {}),
