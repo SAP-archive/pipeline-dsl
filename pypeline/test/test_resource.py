@@ -13,7 +13,6 @@ class TestGitResource(unittest.TestCase):
             "type": "git",
             "icon": "git",
             "source": {
-                "branch": "master",
                 "uri": "https://example.com/repo.git"
             }
         })
