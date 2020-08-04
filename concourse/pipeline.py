@@ -1,4 +1,7 @@
 from pypeline import Pipeline, GitRepo, shell
+import urllib.request
+import os
+import stat
 
 with Pipeline("pypeline") as pipeline:
     pipeline.resource("pypeline", GitRepo("https://github.tools.sap/cki/pypeline",
@@ -13,6 +16,8 @@ with Pipeline("pypeline") as pipeline:
         @job.task()
         def install_and_test():
             shell(["make", "install"], cwd="pypeline")
+            urllib.request.urlretrieve("https://cki-concourse.istio.sapcloud.io/api/v1/cli?arch=amd64&platform=linux", "/usr/bin/fly")
+            os.chmod("/usr/bin/fly", stat.S_IEXEC | stat.S_IREAD)
             shell(["make", "test"], cwd="pypeline")
 
         job.put("pypeline-latest", params={"repository": "pypeline"})
