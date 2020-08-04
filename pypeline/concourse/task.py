@@ -12,8 +12,9 @@ from collections import OrderedDict
 from .__shared import CACHE_DIR, SCRIPT_DIR, concourse_context
 
 class Task:
-    def __init__(self, fun, jobname, timeout, privileged, image_resource, script, inputs, outputs, secrets, attempts, caches):
-        name = fun.__name__
+    def __init__(self, fun, jobname, timeout, privileged, image_resource, script, inputs, outputs, secrets, attempts, caches, name=None):
+        if not name:
+            name = fun.__name__
         self.name = name
         self.timeout = timeout
         self.privileged = privileged
