@@ -27,12 +27,12 @@ class Task:
             "caches": [{"path": cache} for cache in self.caches],
             "params": {**dict(map(lambda kv: (str(kv[1]), '(({}))'.format(str(kv[1]))), secrets.items())),
                        **{
-                "PYTHONPATH": ":".join(list(map(lambda x: SCRIPT_DIR + f"/py{x}", [0,1,2,3,4,5,6,7,8,9]))) + ":/usr/local/lib/python/garden-tools",
+                "PYTHONPATH": f"{SCRIPT_DIR}/pythonpath:{SCRIPT_DIR}/starter:/usr/local/lib/python/garden-tools",
                 "REQUESTS_CA_BUNDLE": '/etc/ssl/certs/ca-certificates.crt'
             }},
             "run": {
                 "path": "/usr/bin/python3",
-                "args": [os.path.join(SCRIPT_DIR, "py0", os.path.basename(script)), "--job", jobname, "--task", name,"--concourse"],
+                "args": [os.path.join(SCRIPT_DIR, "starter", os.path.basename(script)), "--job", jobname, "--task", name,"--concourse"],
             }
         }
         cache_file = os.path.join(CACHE_DIR, jobname, name + ".json")
@@ -97,12 +97,11 @@ class InitTask:
             tar = "tar"
         files = []
         transform = []
-        for dir in self.py_dirs:
-            dir = os.path.abspath(dir)
-            # this is necessary to avoid name collisions
-            transform.append(f"--transform 's|{dir}|py{len(transform)}|g'")
+        for dir_concourse, dir_local in self.py_dirs.items():
+            dir_local = os.path.abspath(dir_local)
+            transform.append(f"--transform 's|{dir_local}|{dir_concourse}|g'")
             files = files + \
-                list(glob.glob(os.path.join(dir, '**', '*.[ps][yh]'), recursive=True))
+                list(glob.glob(os.path.join(dir_local, '**', '*.[ps][yh]'), recursive=True))
         for key, dir in self.script_dirs.items():
             transform.append(f"--transform 's|{dir}|{key}|g'")
             files = files + \

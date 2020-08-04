@@ -19,7 +19,9 @@ class Pipeline():
         module = inspect.getmodule(frame[0])
         self.script = module.__file__
         dirname = os.path.dirname(self.script)
-        self.py_dirs = [dirname, os.path.dirname(os.path.dirname(os.path.dirname(__file__)))]
+        lib_dir = os.path.dirname(os.path.dirname(__file__))
+        self.py_dirs = { "starter": dirname,
+                        f"pythonpath/{os.path.basename(lib_dir)}": lib_dir }
         self.script_dirs = {}
         if isinstance(script_dirs, list):
             for script in script_dirs:
@@ -43,7 +45,7 @@ class Pipeline():
             return self.script_dirs[key]
     
     def path_append(self, dir):
-        self.py_dirs.append(dir)
+        self.py_dirs[f"pythonpath/{os.path.basename(dir)}"] = dir
         sys.path.append(dir)
 
     def __enter__(self):
