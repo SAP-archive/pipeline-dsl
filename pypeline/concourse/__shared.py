@@ -2,7 +2,12 @@ import os
 
 CACHE_DIR = 'tasks'
 SCRIPT_DIR = 'scripts'
-CONCOURSE_CONTEXT = 'concourse'
+__concourse_context = False
 
 def concourse_context():
-    return os.getenv("CONTEXT") == CONCOURSE_CONTEXT
+    global __concourse_context
+    return __concourse_context
+
+def set_concourse_context(value):
+    global __concourse_context
+    __concourse_context = value

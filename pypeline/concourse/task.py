@@ -9,7 +9,7 @@ import glob
 import inspect
 from collections import OrderedDict
 
-from .__shared import CACHE_DIR, CONCOURSE_CONTEXT, SCRIPT_DIR, concourse_context
+from .__shared import CACHE_DIR, SCRIPT_DIR, concourse_context
 
 class Task:
     def __init__(self, fun, jobname, timeout, privileged, image_resource, script, inputs, outputs, secrets, attempts, caches):
@@ -28,12 +28,11 @@ class Task:
             "params": {**dict(map(lambda kv: (str(kv[1]), '(({}))'.format(str(kv[1]))), secrets.items())),
                        **{
                 "PYTHONPATH": ":".join(list(map(lambda x: SCRIPT_DIR + f"/py{x}", [0,1,2,3,4,5,6,7,8,9]))) + ":/usr/local/lib/python/garden-tools",
-                "CONTEXT": CONCOURSE_CONTEXT,
                 "REQUESTS_CA_BUNDLE": '/etc/ssl/certs/ca-certificates.crt'
             }},
             "run": {
                 "path": "/usr/bin/python3",
-                "args": [os.path.join(SCRIPT_DIR, "py0", os.path.basename(script)), "--job", jobname, "--task", name],
+                "args": [os.path.join(SCRIPT_DIR, "py0", os.path.basename(script)), "--job", jobname, "--task", name,"--concourse"],
             }
         }
         cache_file = os.path.join(CACHE_DIR, jobname, name + ".json")
@@ -104,9 +103,8 @@ class InitTask:
             transform.append(f"--transform 's|{dir}|py{len(transform)}|g'")
             files = files + \
                 list(glob.glob(os.path.join(dir, '**', '*.[ps][yh]'), recursive=True))
-        for dir in self.script_dirs:
-            dir = os.path.abspath(dir)
-            transform.append(f"--transform 's|{dir}|{dir.split('/')[-1]}|g'")
+        for key, dir in self.script_dirs.items():
+            transform.append(f"--transform 's|{dir}|{key}|g'")
             files = files + \
                 list(glob.glob(os.path.join(dir, '**', '*.[ps][yh]'), recursive=True))
         transform = sorted(transform,key=len,reverse=True)
