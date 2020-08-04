@@ -1,3 +1,5 @@
+SHELL := /bin/bash
+
 build: pypeline/*.py
 	python setup.py build
 
