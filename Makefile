@@ -9,7 +9,11 @@ install: build
 test: test-examples test-unit
 
 test-examples: 
-	set -euo pipefail; for i in examples/*.py; do python $$i --dump > /dev/null; done
+	@set -euo pipefail; \
+	for i in examples/*.py; do \
+		echo $$i; \
+		fly vp -c <(python $$i --dump); \
+	done
 	
 test-unit:
 	python -m"unittest"
