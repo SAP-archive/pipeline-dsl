@@ -8,5 +8,6 @@ with Pipeline("pypeline") as pipeline:
         job.get("pypeline", trigger=True)
 
         @job.task()
-        def make_test():
+        def install_and_test():
+            shell(["make", "install"], cwd="pypeline")
             shell(["make", "test"], cwd="pypeline")
