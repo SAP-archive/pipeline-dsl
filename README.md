@@ -5,12 +5,8 @@ Python DSL for [concourse](https://concourse-ci.org/)
 
 ## Installation
 
-Currently, there is no pypi repository avaialable within SAP. Therefore, installation must be done manually
-
 ```bash
-git clone https://github.tools.sap/cki/pypeline.git
-cd pypeline
-make install
+pip install git+https://github.tools.sap/cki/pypeline.git@latest
 ```
 
 ## Example
