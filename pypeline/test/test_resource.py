@@ -11,7 +11,9 @@ class TestGitResource(unittest.TestCase):
         self.assertDictEqual(obj, {
             "name": "test",
             "type": "git",
+            "icon": "git",
             "source": {
+                "branch": "master",
                 "uri": "https://example.com/repo.git"
             }
         })
@@ -19,4 +21,4 @@ class TestGitResource(unittest.TestCase):
 if __name__ == '__main__':
     unittest.main()
 
-# run > git -munittest in main pypeline dir to execute
+# run > python -munittest in main pypeline dir to execute
