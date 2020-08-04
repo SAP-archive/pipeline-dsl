@@ -54,12 +54,12 @@ class Job:
         self.inputs.append(name)
         return resource_chain.resource.get(name)
 
-    def task(self, timeout="5m", privileged=False, image_resource=None, resources=[], secrets={}, outputs=[], attempts=1, caches=[]):
+    def task(self, timeout="5m", privileged=False, image_resource=None, resources=[], secrets={}, outputs=[], attempts=1, caches=[], name=None):
         if not image_resource:
             image_resource = self.image_resource
 
         def decorate(fun):
-            task = Task(fun, self.name, timeout, privileged, image_resource, self.script, self.inputs, outputs, secrets, attempts, caches)
+            task = Task(fun, self.name, timeout, privileged, image_resource, self.script, self.inputs, outputs, secrets, attempts, caches, name)
             self.plan.append(task)
             self.tasks[task.name] = task
             return task.fn_cached
