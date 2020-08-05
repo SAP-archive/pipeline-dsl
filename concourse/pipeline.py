@@ -3,7 +3,7 @@ import urllib.request
 import os
 import stat
 
-with Pipeline("pypeline") as pipeline:
+with Pipeline("pypeline", team="garden") as pipeline:
     pipeline.resource("pypeline", GitRepo("https://github.tools.sap/cki/pypeline",
         username="istio-serviceuser", password="((GITHUB_TOOLS_SAP_TOKEN))", ignore_paths=["concourse/*"]))
 
