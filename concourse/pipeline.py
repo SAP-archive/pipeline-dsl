@@ -5,7 +5,7 @@ import stat
 
 with Pipeline("pypeline", team="garden") as pipeline:
     pipeline.resource("pypeline", GitRepo("https://github.tools.sap/cki/pypeline",
-        username="istio-serviceuser", password="((GITHUB_TOOLS_SAP_TOKEN))", ignore_paths=["concourse/*"]))
+        username="istio-serviceuser", password="((GITHUB_TOOLS_SAP_TOKEN))", ignore_paths=["concourse/*"], branch="develop"))
 
     pipeline.resource("pypeline-latest", GitRepo("https://github.tools.sap/cki/pypeline",
         username="istio-serviceuser", password="((GITHUB_TOOLS_SAP_TOKEN))", ignore_paths=["concourse/*"], branch="latest"))
