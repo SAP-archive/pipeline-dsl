@@ -15,9 +15,9 @@ from .task import InitTask, Task
 
 
 class Job:
-    def __init__(self, name, script, script_dirs, py_dirs, image_resource, resource_chains, serial):
+    def __init__(self, name, script, init_dirs, image_resource, resource_chains, serial):
         self.name = name
-        self.plan = [InitTask(script_dirs, py_dirs, image_resource)]
+        self.plan = [InitTask(init_dirs, image_resource)]
         self.image_resource = image_resource
         self.resource_chains = resource_chains
         self.script = script

@@ -12,24 +12,24 @@ from collections import OrderedDict
 
 from .__shared import CACHE_DIR, SCRIPT_DIR, concourse_context, set_concourse_context
 from .job import Job
+from .task import STARTER_DIR, PYTHON_DIR
 
 class Pipeline():
     def __init__(self, name, image_resource={"type": "registry-image", "source": {"repository": "python", "tag": "3.8-buster"}}, script_dirs={}, team="main"):
         frame = inspect.stack()[1]
         module = inspect.getmodule(frame[0])
         self.script = module.__file__
-        dirname = os.path.dirname(self.script)
-        lib_dir = os.path.dirname(os.path.dirname(__file__))
-        self.py_dirs = { "starter": dirname,
-                        f"pythonpath/{os.path.basename(lib_dir)}": lib_dir }
-        self.script_dirs = {}
+        dirname = os.path.abspath(os.path.dirname(self.script))
+        lib_dir = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
+        self.init_dirs = { STARTER_DIR: dirname,
+                        f"{PYTHON_DIR}/{os.path.basename(lib_dir)}": lib_dir }
         if isinstance(script_dirs, list):
             for script in script_dirs:
-                dir = os.path.realpath(os.path.join(dirname,script))
-                self.script_dirs[os.path.basename(dir)]=dir
+                dir = os.path.abspath(os.path.join(dirname,script))
+                self.init_dirs[os.path.basename(dir)]=dir
         else:
             for key, script in script_dirs.items():
-                self.script_dirs[key]=os.path.realpath(os.path.join(dirname,script))
+                self.init_dirs[key]=os.path.abspath(os.path.join(dirname,script))
         self.jobs = []
         self.jobs_by_name = {}
         self.resource_chains = {}
@@ -42,10 +42,10 @@ class Pipeline():
         if concourse_context():
             return os.path.realpath(os.path.join(SCRIPT_DIR,key))
         else:
-            return self.script_dirs[key]
+            return self.init_dirs[key]
     
     def path_append(self, dir):
-        self.py_dirs[f"pythonpath/{os.path.basename(dir)}"] = dir
+        self.init_dirs[f"{PYTHON_DIR}/{os.path.basename(dir)}"] = dir
         sys.path.append(dir)
 
     def __enter__(self):
@@ -81,7 +81,7 @@ class Pipeline():
                             " ".join(list(self.jobs_by_name.keys())))
 
     def job(self, name, serial=False):
-        result = Job(name, self.script, self.script_dirs, self.py_dirs, self.image_resource,
+        result = Job(name, self.script, self.init_dirs, self.image_resource,
                      self.resource_chains, serial=serial)
         self.jobs.append(result)
         self.jobs_by_name[name] = result

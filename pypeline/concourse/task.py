@@ -11,6 +11,9 @@ from collections import OrderedDict
 
 from .__shared import CACHE_DIR, SCRIPT_DIR, concourse_context
 
+STARTER_DIR = "starter"
+PYTHON_DIR = "pythonpath"
+
 class Task:
     def __init__(self, fun, jobname, timeout, privileged, image_resource, script, inputs, outputs, secrets, attempts, caches, name=None):
         if not name:
@@ -28,12 +31,12 @@ class Task:
             "caches": [{"path": cache} for cache in self.caches],
             "params": {**dict(map(lambda kv: (str(kv[1]), '(({}))'.format(str(kv[1]))), secrets.items())),
                        **{
-                "PYTHONPATH": f"{SCRIPT_DIR}/pythonpath:{SCRIPT_DIR}/starter:/usr/local/lib/python/garden-tools",
+                "PYTHONPATH": f"{SCRIPT_DIR}/{PYTHON_DIR}:{SCRIPT_DIR}/{STARTER_DIR}:/usr/local/lib/python/garden-tools",
                 "REQUESTS_CA_BUNDLE": '/etc/ssl/certs/ca-certificates.crt'
             }},
             "run": {
                 "path": "/usr/bin/python3",
-                "args": [os.path.join(SCRIPT_DIR, "starter", os.path.basename(script)), "--job", jobname, "--task", name,"--concourse"],
+                "args": [os.path.join(SCRIPT_DIR, STARTER_DIR, os.path.basename(script)), "--job", jobname, "--task", name,"--concourse"],
             }
         }
         cache_file = os.path.join(CACHE_DIR, jobname, name + ".json")
@@ -86,32 +89,26 @@ class Task:
 
 
 class InitTask:
-    def __init__(self, script_dirs, py_dirs, image_resource):
-        self.script_dirs = script_dirs
-        self.py_dirs = py_dirs
+    def __init__(self, init_dirs, image_resource):
+        self.init_dirs = init_dirs
         self.image_resource = image_resource
 
-    def concourse(self):
-        if platform.system() == "Darwin":
-            tar = "gtar"
-        else:
-            tar = "tar"
+
+    def package(self):
+        tar =  "gtar" if platform.system() == "Darwin" else "tar"
         files = []
         transform = []
-        for dir_concourse, dir_local in self.py_dirs.items():
+        init_dirs = sorted(list(self.init_dirs.items()), key=lambda d: len(d[1]), reverse=True)
+        for dir_concourse, dir_local in init_dirs:
             dir_local = os.path.abspath(dir_local)
             transform.append(f"--transform 's|{dir_local}|{dir_concourse}|g'")
             files = files + \
                 list(glob.glob(os.path.join(dir_local, '**', '*.[ps][yh]'), recursive=True))
-        for key, dir in self.script_dirs.items():
-            transform.append(f"--transform 's|{dir}|{key}|g'")
-            files = files + \
-                list(glob.glob(os.path.join(dir, '**', '*.[ps][yh]'), recursive=True))
-        transform = sorted(transform,key=len,reverse=True)
         cmd = f'{tar} cj --sort=name --mtime="UTC 2019-01-01" {" ".join(transform)} --owner=root:0 --group=root:0 -b 1 -P -f - {" ".join(files)}'
-        data = base64.b64encode(subprocess.check_output(
-            cmd, shell=True)).decode("utf-8")
-        return {
+        return base64.b64encode(subprocess.check_output(cmd, shell=True)).decode("utf-8")
+
+    def concourse(self):
+         return {
             "task": "init",
             "config": {
                 "platform": "linux",
@@ -121,7 +118,7 @@ class InitTask:
                     "path": "/bin/bash",
                     "args": [
                         '-ceu',
-                        f'echo "{data}" | base64 -d | tar -C {SCRIPT_DIR} -xvjf -',
+                        f'echo "{self.package()}" | base64 -d | tar -C {SCRIPT_DIR} -xvjf -',
                     ],
                 }
             }
