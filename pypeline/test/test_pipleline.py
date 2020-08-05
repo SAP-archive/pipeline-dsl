@@ -40,7 +40,7 @@ class TestPipline(unittest.TestCase):
                 'fake': os.path.join(TEST_DIR,'fake_scripts')
             })
             data = init_task.package()
-            files = subprocess.check_output(["tar","tzf", "-"], input=base64.b64decode(data)).decode("utf-8").split()
+            files = subprocess.check_output(["tar","tjf", "-"], input=base64.b64decode(data)).decode("utf-8").split()
             self.assertIn(f"starter/{os.path.basename(__file__)}",files)
             self.assertIn(START_SCRIPT,files)
             self.assertIn(STOP_SCRIPT,files)
