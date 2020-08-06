@@ -1,6 +1,6 @@
 # conpype
 
-Python DSL for [concourse](https://concourse-ci.org/)
+[Concourse](https://concourse-ci.org/) pipeline DSL
 
 
 ## Installation
