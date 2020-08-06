@@ -114,6 +114,21 @@ The exact params depend on the resource used. For a list of resources available 
 conpype will automatically adds all prior jobs, using the same resource (`get` or `put`), to the `passed` argument of `get`-steps. If this is not intended, the passed argument has to be specified explicitly (e.g. `job.get("my-repo", passed=[])`).
 
 
+### Using shell scripts
+
+It's possible to package shell scripts within the pipeline to speed up turnaround times (no commits required). Therefore, you can specify a parameter `script_dirs` when constructing a `Pipeline`. This parameter is a dictionary, which hold a key and a relative path (from the python script which describes the pipeline) to a directory. This directory is packaged automatically and can be accessed using `Pipeline.script_dir(key)`.
+
+```python
+with Pipeline("test",script_dirs={"myscripts":"../bin"}) as pipeline:
+    with pipeline.job("job") as job:
+        @job.task()
+        def task():
+            script_dir = pipeline.script_dri("myscripts")
+            shell([os.path.join(script_dir),"task.sh"])
+```
+
+When running locally, `Pipeline.script_dir(key)` return the local path to your scripts.
+
 ## Local execution
 
 It's possible to execute each task locally
