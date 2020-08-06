@@ -19,7 +19,7 @@ def concourse_ctx():
 
 TEST_DIR = os.path.abspath(os.path.dirname(__file__))
 
-class TestPipline(unittest.TestCase):
+class TestPipeline(unittest.TestCase):
 
     def test_init_task(self):
         with Pipeline("test",script_dirs={"fake":"fake_scripts"}) as pipeline:
