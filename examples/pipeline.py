@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from pypeline import Pipeline, GitRepo
+from conpype import Pipeline, GitRepo
 
 with Pipeline("c21s") as pipeline:
     pipeline.resource("shalm", GitRepo("https://github.com/wonderix/shalm"))

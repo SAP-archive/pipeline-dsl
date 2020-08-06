@@ -4,14 +4,14 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="pypeline",
+    name="conpype",
     version="0.0.1",
     author="SAP SE",
     author_email="istio@sap.com",
     description="Concourse Pipeline in Python DSL",
     long_description_content_type="text/markdown",
     long_description=long_description,
-    url="https://github.tools.sap/cki/pypeline",
+    url="https://github.tools.sap/cki/conpype",
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",

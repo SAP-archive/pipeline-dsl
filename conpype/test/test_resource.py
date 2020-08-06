@@ -1,6 +1,6 @@
 import unittest
 
-from pypeline import *
+from conpype import *
 
 class TestGitResource(unittest.TestCase):
 
@@ -20,4 +20,4 @@ class TestGitResource(unittest.TestCase):
 if __name__ == '__main__':
     unittest.main()
 
-# run > python -munittest in main pypeline dir to execute
+# run > python -munittest in main conpype dir to execute

@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 
-build: pypeline/*.py
+build: conpype/*.py
 	python setup.py build
 
 install: build
@@ -12,8 +12,8 @@ test-examples:
 	@set -euo pipefail; \
 	for i in examples/*.py; do \
 		echo $$i; \
-		fly vp -c <(python $$i --dump); \
+		fly vp -c <(PYTHONPATH=$$(PWD) python $$i --dump); \
 	done
 	
 test-unit:
-	python -m"unittest"
+	PYTHONPATH=$$(PWD) python -m"unittest"

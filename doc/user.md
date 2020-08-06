@@ -107,11 +107,11 @@ with pipeline.job("bump-cf4k8s-templates", serial=True) as job:
     job.put("my-repo", params={"repository": "publish/my-repo", "rebase": True})
 ```
 
-The exact params depend on the resource used. For a list of resources available in pypeline, see [the reference guide](./reference.md#resources).
+The exact params depend on the resource used. For a list of resources available in conpype, see [the reference guide](./reference.md#resources).
 
 ### Passed attribute on get steps
 
-Pypeline will automatically adds all prior jobs, using the same resource (`get` or `put`), to the `passed` argument of `get`-steps. If this is not intended, the passed argument has to be specified explicitly (e.g. `job.get("my-repo", passed=[])`).
+conpype will automatically adds all prior jobs, using the same resource (`get` or `put`), to the `passed` argument of `get`-steps. If this is not intended, the passed argument has to be specified explicitly (e.g. `job.get("my-repo", passed=[])`).
 
 
 ## Local execution

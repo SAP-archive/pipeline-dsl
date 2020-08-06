@@ -1,5 +1,5 @@
 import os
-from pypeline.concourse import concourse_context
+from conpype.concourse import concourse_context
 
 class DockerImageResource:
     def __init__(self, name):

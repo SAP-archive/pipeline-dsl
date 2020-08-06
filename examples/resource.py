@@ -1,4 +1,4 @@
-from pypeline import *
+from conpype import *
 
 with Pipeline("kubernetes") as pipeline:
     pipeline.resource("kubernetes", GitRepo("https://github.com/kubernetes/kubernetes"))

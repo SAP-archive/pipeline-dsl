@@ -1,11 +1,11 @@
 import unittest
 
-from pypeline import *
+from conpype import *
 import base64
 import subprocess
 from collections import OrderedDict
-from pypeline.utils.docker_daemon import START_SCRIPT, STOP_SCRIPT
-from pypeline.concourse.__shared import SCRIPT_DIR, set_concourse_context
+from conpype.utils.docker_daemon import START_SCRIPT, STOP_SCRIPT
+from conpype.concourse.__shared import SCRIPT_DIR, set_concourse_context
 from contextlib import contextmanager
 
 @contextmanager
@@ -36,7 +36,7 @@ class TestPipline(unittest.TestCase):
             self.assertTrue(isinstance(init_task,InitTask))
             self.assertEqual(init_task.init_dirs,{
                 'starter': TEST_DIR,
-                'pythonpath/pypeline': os.path.dirname(TEST_DIR),
+                'pythonpath/conpype': os.path.dirname(TEST_DIR),
                 'fake': os.path.join(TEST_DIR,'fake_scripts')
             })
             data = init_task.package()
@@ -55,4 +55,4 @@ class TestPipline(unittest.TestCase):
 if __name__ == '__main__':
     unittest.main()
 
-# run > python -munittest in main pypeline dir to execute
+# run > python -munittest in main conpype dir to execute

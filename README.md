@@ -1,4 +1,4 @@
-# Pypeline
+# conpype
 
 Python DSL for [concourse](https://concourse-ci.org/)
 
@@ -6,13 +6,13 @@ Python DSL for [concourse](https://concourse-ci.org/)
 ## Installation
 
 ```bash
-pip install git+https://github.tools.sap/cki/pypeline.git@latest
+pip install git+https://github.tools.sap/cki/conpype.git@latest
 ```
 
 ## Example
 
 ```python
-from pypeline import Pipeline, GitRepo
+from conpype import Pipeline, GitRepo
 
 with Pipeline("c21s") as pipeline:
     pipeline.resource("shalm", GitRepo("https://github.com/wonderix/shalm"))

@@ -1,5 +1,5 @@
 import os
-from pypeline.concourse import concourse_context, subprocess
+from conpype.concourse import concourse_context, subprocess
 
 class GitRepoResource:
     def __init__(self, name):
