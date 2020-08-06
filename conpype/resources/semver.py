@@ -60,22 +60,17 @@ class SemVerGitDriver:
             "uri": self.uri,
             "branch": self.branch,
             "file": self.file,
+            "private_key": self.private_key,
+            "username": self.username,
+            "password": self.password,
+            "git_user": self.git_user,
+            "depth": self.depth,
+            "skip_ssl_verification": self.skip_ssl_verification,
+            "commit_message": self.commit_message
         }
-        if self.private_key != None:
-            result["private_key"] = self.private_key
-        if self.username != None:
-            result["username"] = self.username
-        if self.password != None:
-            result["password"] = self.password
-        if self.git_user != None:
-            result["git_user"] = self.git_user
-        if self.depth != None:
-            result["depth"] = self.depth
-        if self.skip_ssl_verification != None:
-            result["skip_ssl_verification"] = self.skip_ssl_verification
-        if self.commit_message != None:
-            result["commit_message"] = self.commit_message
-        return result
+
+        return dict(filter(lambda x: x[1] is not None, result.items()))
 
     def get(self, name):
         return None
+        

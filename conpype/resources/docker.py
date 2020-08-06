@@ -37,6 +37,7 @@ class DockerImage:
                 "tag": self.tag
             }
         }
+        result["source"] = dict(filter(lambda x: x[1] is not None, result["source"].items()))
         return result
 
     def get(self, name):

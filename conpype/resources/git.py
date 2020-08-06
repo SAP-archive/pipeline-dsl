@@ -50,13 +50,14 @@ class GitRepo:
             "icon": "git",
             "source": {
                 "uri": self.uri,
-                **({"branch": self.branch} if self.branch is not None else {}),
-                **({"username": self.username} if self.username is not None else {}),
-                **({"password": self.password} if self.password is not None else {}),
-                **({"ignore_paths": self.ignore_paths} if self.ignore_paths is not None else {}),
-                **({"tag_filter": self.tag_filter} if self.ignore_paths is not None else {}),
+                "branch": self.branch,
+                "username": self.username,
+                "password": self.password,
+                "ignore_paths": self.ignore_paths,
+                "tag_filter": self.tag_filter
             }
         }
+        result["source"] = dict(filter(lambda x: x[1] is not None, result["source"].items()))
         return result
 
     def get(self, name):
