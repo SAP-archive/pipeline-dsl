@@ -41,7 +41,7 @@ class GithubRelease:
                 "pre_release": self.pre_release,
                 "release": self.release,
                 "github_api_url": self.github_api_url,
-                "github_uplaods_url": self.github_uploads_url
+                "github_uploads_url": self.github_uploads_url
             }
         }
         result["source"] = dict(filter(lambda x: x[1] is not None, result["source"].items()))
