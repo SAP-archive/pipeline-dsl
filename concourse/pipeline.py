@@ -7,8 +7,13 @@ import json
 import sys
 
 COVERAGE_THRESHOLD = 75 
+DEFAULT_IMAGE = {"type": "docker-image",
+                 "source": {"repository": "gcr.io/sap-se-gcp-istio-dev/ci-image",
+                            "tag": "latest",
+                            "username": "_json_key",
+                            "password": "((IMAGE_PULL_SECRETS))"}}
 
-with Pipeline("conpype", team="garden") as pipeline:
+with Pipeline("conpype", team="garden", image_resource=DEFAULT_IMAGE) as pipeline:
     pipeline.resource("conpype", GitRepo("https://github.tools.sap/cki/conpype",
         username="istio-serviceuser", password="((GITHUB_TOOLS_SAP_TOKEN))", ignore_paths=["concourse/*"], branch="develop"))
 
@@ -30,7 +35,6 @@ with Pipeline("conpype", team="garden") as pipeline:
         job.get("conpype", trigger=True)
         @job.task()
         def ensure_coverage():
-            shell(["pip", "install", "coverage"], cwd="conpype")
             shell(["make", "coverage"], cwd="conpype")
             repjson = subprocess.check_output(["coverage", "json", "-o", "-"], cwd="conpype")
             report = json.loads(repjson)
