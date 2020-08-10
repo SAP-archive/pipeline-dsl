@@ -67,7 +67,7 @@ class Job:
         return decorate
 
     def in_parallel(self, fail_fast=False):
-        parallel_task = ParallelStep(self, fail_fast)
+        parallel_task = ParallelStep(self, fail_fast, self.secret_manager)
         self.plan.append(parallel_task)
         return parallel_task
 
@@ -140,17 +140,18 @@ class TryStep:
         }
 
 class ParallelStep:
-    def __init__(self, job, fail_fast):
+    def __init__(self, job, fail_fast, secret_manager=None):
         self.job = job
         self.tasks = []
         self.fail_fast = fail_fast
+        self.secret_manager = secret_manager
 
-    def task(self, timeout="5m", privileged=False, image_resource=None, resources=[], secrets={}, outputs=[], attempts=1, caches=[]):
+    def task(self, timeout="5m", privileged=False, image_resource=None, resources=[], secrets={}, outputs=[], attempts=1, caches=[], name=None):
         if not image_resource:
             image_resource = self.job.image_resource
 
         def decorate(fun):
-            task = Task(fun, self.job.name, timeout, privileged, image_resource, self.job.script, self.job.inputs, outputs, secrets, attempts, caches)
+            task = Task(fun, self.job.name, timeout, privileged, image_resource, self.job.script, self.job.inputs, outputs, secrets, attempts, caches, name, self.secret_manager)
             self.tasks.append(task)
             self.job.tasks[task.name] = task
             return task.fn_cached
