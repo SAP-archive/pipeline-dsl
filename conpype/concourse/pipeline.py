@@ -14,6 +14,12 @@ from .__shared import CACHE_DIR, SCRIPT_DIR, concourse_context, set_concourse_co
 from .job import Job
 from .task import STARTER_DIR, PYTHON_DIR
 
+def env_secret_manager(key):
+    return os.getenv(os.path.basename(key))
+
+def vault_secret_manager(key):
+    return subprocess.check_output(["vault", "read", "-field=value",key]).decode("utf-8")
+
 class Pipeline():
     def __init__(self, name, image_resource={"type": "registry-image", "source": {"repository": "python", "tag": "3.8-buster"}}, script_dirs={}, team="main"):
         frame = inspect.stack()[1]
@@ -37,6 +43,12 @@ class Pipeline():
         self.name = name
         self.image_resource = image_resource
         self.team = team
+        self.secret_manager = env_secret_manager
+
+    def __create_secret_manager(self):
+        def namespaced_secret_manager(key):
+            return self.secret_manager(os.path.join("/concourse",self.team,key))
+        return namespaced_secret_manager
 
     def script_dir(self,key):
         if concourse_context():
@@ -55,12 +67,15 @@ class Pipeline():
         parser.add_argument('--task', help='name of the task to run')
         parser.add_argument('--target', help='upload concourse yaml to the given target')
         parser.add_argument('--concourse', dest='concourse', action='store_true', help='set concourse context to true')
+        parser.add_argument('--secret-manager', default='env', choices=['env','vault'], help='set secret manager')
         parser.add_argument('--dump', dest='dump',
                             action='store_true', help='dump concourse yaml')
 
         self.args = parser.parse_args()
 
         set_concourse_context(self.args.concourse)
+        if self.args.secret_manager == 'vault':
+            self.secret_manager = vault_secret_manager
 
         return self
 
@@ -82,7 +97,7 @@ class Pipeline():
 
     def job(self, name, serial=False):
         result = Job(name, self.script, self.init_dirs, self.image_resource,
-                     self.resource_chains, serial=serial)
+                     self.resource_chains, self.__create_secret_manager(), serial=serial)
         self.jobs.append(result)
         self.jobs_by_name[name] = result
         return result

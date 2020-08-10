@@ -15,7 +15,7 @@ STARTER_DIR = "starter"
 PYTHON_DIR = "pythonpath"
 
 class Task:
-    def __init__(self, fun, jobname, timeout, privileged, image_resource, script, inputs, outputs, secrets, attempts, caches, name=None):
+    def __init__(self, fun, jobname, timeout, privileged, image_resource, script, inputs, outputs, secrets, attempts, caches, name, secret_manager):
         if not name:
             name = fun.__name__
         self.name = name
@@ -23,6 +23,7 @@ class Task:
         self.privileged = privileged
         self.attempts = attempts
         self.caches = caches
+        self.secret_manager = secret_manager
         self.config = {
             "platform": "linux",
             "image_resource": image_resource,
@@ -45,7 +46,7 @@ class Task:
             print(f"Running: {name}")
             kwargs = {}
             for kv in secrets.items():
-                kwargs[kv[0]] = os.getenv(str(kv[1]))
+                kwargs[kv[0]] = self.secret_manager(str(kv[1]))
                 if not kwargs[kv[0]] and not isinstance(kv[1], OptionalSecret):
                     raise Exception(f'Secret not available as environment variable "{kv[1]}"')
             for out in outputs:

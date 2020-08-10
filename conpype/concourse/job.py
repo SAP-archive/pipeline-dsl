@@ -15,7 +15,7 @@ from .task import InitTask, Task
 
 
 class Job:
-    def __init__(self, name, script, init_dirs, image_resource, resource_chains, serial):
+    def __init__(self, name, script, init_dirs, image_resource, resource_chains, secret_manager, serial):
         self.name = name
         self.plan = [InitTask(init_dirs, image_resource)]
         self.image_resource = image_resource
@@ -27,6 +27,7 @@ class Job:
         self.on_failure = None
         self.on_abort = None
         self.ensure = None
+        self.secret_manager = secret_manager
 
     def __enter__(self):
         return self
@@ -59,7 +60,7 @@ class Job:
             image_resource = self.image_resource
 
         def decorate(fun):
-            task = Task(fun, self.name, timeout, privileged, image_resource, self.script, self.inputs, outputs, secrets, attempts, caches, name)
+            task = Task(fun, self.name, timeout, privileged, image_resource, self.script, self.inputs, outputs, secrets, attempts, caches, name, self.secret_manager)
             self.plan.append(task)
             self.tasks[task.name] = task
             return task.fn_cached
