@@ -17,3 +17,7 @@ test-examples:
 	
 test-unit:
 	PYTHONPATH=$$(PWD) python -m"unittest"
+
+coverage:
+	coverage run -m unittest
+	coverage report
