@@ -144,6 +144,52 @@ class TestGithubResource(unittest.TestCase):
             }
         })
 
+class TestSemVerResource(unittest.TestCase):
+
+    def test_private_key(self):
+        resource = SemVer(SemVerGitDriver("git@github.com:concourse/concourse.git", "version", "version-file", private_key="testkey", username="user", git_user="git_user", depth=1, skip_ssl_verification=True, commit_message="Commit Message"))
+        obj = resource.concourse("test")
+        
+        self.assertDictEqual(obj, {
+            "name": "test",
+            "type": "semver",
+            "icon": "creation",
+            "source": {
+                "driver": "git",
+                "uri": "git@github.com:concourse/concourse.git",
+                "branch": "version",
+                "file": "version-file",
+                "private_key": "testkey",
+                "username": "user",
+                "depth": 1,
+                "git_user": "git_user",
+                "skip_ssl_verification": True,
+                "commit_message": "Commit Message"
+            }
+        })
+
+    def test_password(self):
+        resource = SemVer(SemVerGitDriver("git@github.com:concourse/concourse.git", "version", "version-file", password="pw", username="user", git_user="git_user", depth=1, skip_ssl_verification=True, commit_message="Commit Message"))
+        obj = resource.concourse("test")
+        
+        self.assertDictEqual(obj, {
+            "name": "test",
+            "type": "semver",
+            "icon": "creation",
+            "source": {
+                "driver": "git",
+                "uri": "git@github.com:concourse/concourse.git",
+                "branch": "version",
+                "file": "version-file",
+                "password": "pw",
+                "username": "user",
+                "depth": 1,
+                "git_user": "git_user",
+                "skip_ssl_verification": True,
+                "commit_message": "Commit Message"
+            }
+        })
+
 if __name__ == '__main__':
     unittest.main()
 
