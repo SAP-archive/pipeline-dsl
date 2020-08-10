@@ -1,4 +1,4 @@
-class GoogleCloudStorageResource:
+class GoogleCloudStorage:
     def __init__(self, bucket, regexp, credentials):
         self.bucket = bucket
         self.regexp = regexp
@@ -29,3 +29,4 @@ class GoogleCloudStorageResource:
             }
         }
         return result
+

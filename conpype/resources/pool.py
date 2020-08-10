@@ -1,4 +1,4 @@
-class ConcourseLockResource:
+class Pool:
     def __init__(self, uri, branch, pool, username, password):
         self.uri = uri
         self.branch = branch
