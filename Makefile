@@ -12,13 +12,13 @@ test-examples:
 	@set -euo pipefail; \
 	for i in examples/*.py; do \
 		echo $$i; \
-		fly vp -c <(PYTHONPATH=$$(PWD) python $$i --dump); \
+		fly vp -c <(PYTHONPATH=$$(pwd) python $$i --dump); \
 	done
 	
 test-unit:
-	PYTHONPATH=$$(PWD) python -m"unittest"
+	PYTHONPATH=$$(pwd) python -m"unittest"
 
 coverage:
-	PYTHONPATH=$$(PWD) coverage run -m unittest
+	PYTHONPATH=$$(pwd) coverage run -m unittest
 	coverage html
 	coverage report
