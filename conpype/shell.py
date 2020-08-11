@@ -22,10 +22,4 @@ def shell(cmd, check=True, cwd=None, capture_output=False):
 
     print(" ".join(
         list(map(lambda x: "<redacted>" if isinstance(x, Password) else str(x), cmd))))
-    try:
-        return subprocess.run(list(map(lambda x: str(x), cmd)), check=check, cwd=cwd, stdout=stdout, stderr=stderr)
-    except (subprocess.CalledProcessError, FileNotFoundError) as error:
-        print(error)
-        frame = inspect.stack()[1]
-        print(f"    At {frame.filename}:{frame.lineno} in function {frame.function}")
-        sys.exit(1)
+    return subprocess.run(list(map(lambda x: str(x), cmd)), check=check, cwd=cwd, stdout=stdout, stderr=stderr)

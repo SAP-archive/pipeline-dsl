@@ -129,9 +129,30 @@ class Pipeline():
                 yaml.dump(self.concourse(), f, allow_unicode=True)
             subprocess.run(["fly", "-t", self.args.target, "set-pipeline", "-c", config_file, "-p", self.name, "-n"], check=True)
         elif self.args.job:
-            print(self.run_task(self.args.job, self.args.task))
+            try:
+                print(self.run_task(self.args.job, self.args.task))
+            except Exception as e:
+                self.__print_error(e)
+                sys.exit(1)
         else:
-            print(self.run())
+            try:
+                print(self.run())
+            except Exception as e:
+                self.__print_error(e)
+                sys.exit(1)
+
+    def __print_error(self, e: Exception):
+        frames = inspect.getinnerframes(e.__traceback__)
+        BOLD_ERROR = '\033[31;1m  *  '
+        NORMAL_ERROR = '\033[31m     '
+        ENDC = '\033[0m'
+        print('\033[31;1mError: ' + str(e) + ENDC)
+        for frame in frames:
+            prefix = NORMAL_ERROR
+            if frame.filename.startswith(os.path.dirname(self.script)):
+                prefix = BOLD_ERROR
+            print(f"{prefix}At {frame.filename}:{frame.lineno} in function {frame.function}{ENDC}")
+
 
 class ResourceChain:
     def __init__(self, resource):
