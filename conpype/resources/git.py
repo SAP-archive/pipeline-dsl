@@ -32,13 +32,14 @@ class GitRepoResource:
 
 
 class GitRepo:
-    def __init__(self, uri, username=None, password=None, branch=None, ignore_paths=None, tag_filter=None):
+    def __init__(self, uri, username=None, password=None, branch=None, ignore_paths=None, tag_filter=None, git_config={}):
         self.uri = uri
         self.username = username
         self.password = password
         self.branch = branch
         self.ignore_paths = ignore_paths
         self.tag_filter = tag_filter
+        self.git_config = git_config
 
     def resource_type(self):
         return None
@@ -54,7 +55,8 @@ class GitRepo:
                 "username": self.username,
                 "password": self.password,
                 "ignore_paths": self.ignore_paths,
-                "tag_filter": self.tag_filter
+                "tag_filter": self.tag_filter,
+                "git_config" : list(map(lambda kv: { "name" : kv[0], "value": kv[1]}, self.git_config.items()))
             }
         }
         result["source"] = dict(filter(lambda x: x[1] is not None, result["source"].items()))

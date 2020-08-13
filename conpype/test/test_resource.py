@@ -6,7 +6,7 @@ from conpype.resources import *
 class TestGitResource(unittest.TestCase):
 
     def test_basic(self):
-        repo = GitRepo("https://example.com/repo.git")
+        repo = GitRepo("https://example.com/repo.git",git_config={"user.name": "unknown", "user.email": "unknown@example.com"})
 
         obj = repo.concourse(name="test")
         self.assertDictEqual(obj, {
@@ -14,7 +14,17 @@ class TestGitResource(unittest.TestCase):
             "type": "git",
             "icon": "git",
             "source": {
-                "uri": "https://example.com/repo.git"
+                "uri": "https://example.com/repo.git",
+                "git_config" : [
+                    {
+                        "name": "user.name",
+                        "value": "unknown"
+                    },
+                    {
+                        "name": "user.email",
+                        "value": "unknown@example.com"
+                    }
+                ]
             }
         })
 
