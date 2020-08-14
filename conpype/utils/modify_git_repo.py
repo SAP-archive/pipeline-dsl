@@ -1,14 +1,25 @@
 import os
+from conpype.resources.git import GitRepoResource
 from conpype.shell import shell
 from contextlib import contextmanager
 
 @contextmanager
-def modify_git_repo(source, target, message, cached=False):
+def modify_git_repo(source_repo, target, message, cached=False):
+    user_name = "unknown"
+    user_email = "unknown@nowhere"
+    if isinstance(source_repo,GitRepoResource):
+        source=source_repo.path
+        user_name = source_repo.config.get("user.name",user_name)
+        user_email = source_repo.config.get("user.email",user_email)
+    else:
+        source=source_repo
     shell(["rm", "-rf", target])
     shell(["cp", "-a", source, target])
     cwd = os.getcwd()
     try:
         os.chdir(target)
+        shell(["git", "config", "user.name", user_name])
+        shell(["git", "config", "user.email", user_email])
         shell(["git", "reset", "--hard", "HEAD"])
         shell(["git", "clean", "-f", "-d", "-x"])
         yield

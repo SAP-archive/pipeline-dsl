@@ -2,8 +2,9 @@ import os
 from conpype.concourse import concourse_context, subprocess
 
 class GitRepoResource:
-    def __init__(self, name, uri):
+    def __init__(self, name, uri, config):
         self.name = name
+        self.config = config
         if concourse_context():
             self.path = os.path.abspath(self.name)
         else:
@@ -63,4 +64,4 @@ class GitRepo:
         return result
 
     def get(self, name):
-        return GitRepoResource(name,self.uri)
+        return GitRepoResource(name, self.uri, self.git_config)
