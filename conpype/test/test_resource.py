@@ -1,6 +1,7 @@
 import unittest
-
+import os
 from conpype.resources import *
+from conpype.concourse.__shared import concourse_ctx
 
 
 class TestGitResource(unittest.TestCase):
@@ -27,6 +28,11 @@ class TestGitResource(unittest.TestCase):
                 ]
             }
         })
+    
+    def test_path(self):
+        with concourse_ctx(False):
+            repo = GitRepo("https://example.com/repo.git",git_config={"user.name": "unknown", "user.email": "unknown@example.com"})
+            self.assertEqual(repo.get("xxx").path,os.path.join(os.environ["HOME"],"workspace","repo"))
 
 
 class TestCronResource(unittest.TestCase):
