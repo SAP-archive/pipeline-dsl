@@ -2,33 +2,33 @@ import os
 from conpype.concourse import concourse_context, subprocess
 
 class GitRepoResource:
-    def __init__(self, name):
+    def __init__(self, name, uri):
         self.name = name
         if concourse_context():
             self.path = os.path.abspath(self.name)
         else:
-            self.path = os.getenv("HOME") + "/workspace/" + self.name
+            self.path = os.getenv("HOME") + "/workspace/" + os.path.splitext(os.path.basename(uri))[0]
 
     def __str__(self):
-        return self.directory()
+        return self.path
 
     def directory(self):
         return self.path
 
     def ref(self):
         if concourse_context():
-            with open(os.path.join(self.directory(), ".git/ref")) as f:
+            with open(os.path.join(self.path, ".git/ref")) as f:
                 return f.read().strip()
         try:
-            return subprocess.check_output(["git", "describe", "--tags"], cwd=self.directory()).decode("utf-8").strip()
+            return subprocess.check_output(["git", "describe", "--tags"], cwd=self.path).decode("utf-8").strip()
         except:
-            return subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=self.directory()).decode("utf-8").strip()
+            return subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=self.path).decode("utf-8").strip()
 
     def short_ref(self):
         if concourse_context():
-            with open(os.path.join(self.directory(), ".git/short_ref")) as f:
+            with open(os.path.join(self.path, ".git/short_ref")) as f:
                 return f.read().strip()
-        return subprocess.check_output(["git", "rev-parse", "--short", "HEAD"], cwd=self.directory()).decode("utf-8").strip()
+        return subprocess.check_output(["git", "rev-parse", "--short", "HEAD"], cwd=self.path).decode("utf-8").strip()
 
 
 class GitRepo:
@@ -63,4 +63,4 @@ class GitRepo:
         return result
 
     def get(self, name):
-        return GitRepoResource(name)
+        return GitRepoResource(name,self.uri)

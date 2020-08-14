@@ -48,7 +48,7 @@ def hello(my_secret_arg):
 
 The secret with the specified name (in this case `MY_SECRET_IN_SECRET_STORE`) will be available as an environment variable with the same name and will be passed to the function as the parameter with the specified name (in this case `my_secret_arg`). 
 
-In a local environment the secret values are taken from environment variables.
+In a local environment the secret values are taken from environment variables or read from the secret-manager (see command line arguments)
 
 
 ## Resources
@@ -138,8 +138,8 @@ python <pipeline> --job <job> --task <task>
 ```
 
 In this case 
-* all repositories are expected to be located in `$HOME/workspace/<resourcename>`
-* all secrets are set as environment variable
+* all repositories are expected to be located in `$HOME/workspace/<basename of github repo>`
+* all secrets are either set as environment variable or the flag `--secret-manager vault` is passed as argument. In the second case you need to run `vault login` before starting the task locally.
 * no get actions on resources are executed
 * no put actions on resources are executed
 
@@ -171,6 +171,18 @@ with pipeline.job("mylib-job") as job:
 
 You can also package the code you would like to reuse into you cicd-image (e.g. using pip). You can specify the cicd-image which should be used for each pipeline, job or task.
 
+
+## Command line arguments
+
+| Argument         | Description                               |
+|------------------|-------------------------------------------|
+| -h, --help       | show this help message and exit           |
+| --job JOB        | name of the job to run                    |
+| --task TASK      | name of the task to run                   |
+| --target TARGET  | upload concourse yaml to the given target |
+| --concourse      | set concourse context to true             |
+| --secret-manager | {env,vault}  set secret manager           |
+| --dump           | dump concourse yaml                       |
 
 ## Calling other tasks
 
