@@ -73,7 +73,7 @@ class Job:
 
     def concourse(self):
         obj = {
-            "name": self.name,
+            "name": self.name.replace("_", "-"),
             "plan": list(map(lambda x: x.concourse(), self.plan)),
             "serial": self.serial
         }

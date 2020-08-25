@@ -78,7 +78,7 @@ class Task:
 
     def concourse(self):
         concourse = {
-            "task": self.name,
+            "task": self.name.replace("_", "-"),
             "timeout": self.timeout,
             "privileged": self.privileged,
             "config": self.config,
