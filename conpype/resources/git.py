@@ -5,6 +5,7 @@ class GitRepoResource:
     def __init__(self, name, uri, config):
         self.name = name
         self.config = config
+        self.uri = uri
         if concourse_context():
             self.path = os.path.abspath(self.name)
         else:
