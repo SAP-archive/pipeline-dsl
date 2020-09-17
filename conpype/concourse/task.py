@@ -17,7 +17,7 @@ PYTHON_DIR = "pythonpath"
 class Task:
     def __init__(self, fun, jobname, timeout, privileged, image_resource, script, inputs, outputs, secrets, attempts, caches, name, secret_manager):
         if not name:
-            name = fun.__name__
+            name = fun.__name__.replace("_", "-")
         self.name = name
         self.timeout = timeout
         self.privileged = privileged
