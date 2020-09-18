@@ -20,7 +20,7 @@ def modify_git_repo(source_repo, target, message, cached=False):
         os.chdir(target)
         shell(["git", "config", "user.name", user_name])
         shell(["git", "config", "user.email", user_email])
-        shell(["git", "reset", "--hard", "HEAD"])
+        shell(["git", "reset", "--mixed", "HEAD"]) # Keep working tree untouched
         shell(["git", "clean", "-f", "-d", "-x"])
         yield
         try:
