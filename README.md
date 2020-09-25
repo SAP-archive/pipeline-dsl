@@ -3,6 +3,13 @@
 [Concourse](https://concourse-ci.org/) pipeline DSL
 
 
+## Features
+
+* Develop complete Concourse pipelines in plain Python
+* Test Pipelines inside Concourse without pushing them to github 
+* Test Pipelines locally
+
+
 ## Installation
 
 ```bash
