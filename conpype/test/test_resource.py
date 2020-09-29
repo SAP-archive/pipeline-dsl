@@ -119,7 +119,7 @@ class TestPoolResource(unittest.TestCase):
         obj = resource.concourse("test")
         self.assertDictEqual(obj, {
             "name": "test",
-            "type": "pool_stable",
+            "type": "pool-stable",
             "icon": "lock",
             "source": {
                 "uri": "uri",
@@ -131,7 +131,7 @@ class TestPoolResource(unittest.TestCase):
         })
 
         self.assertDictEqual(resource.resource_type(), {
-            "name": "pool_stable",
+            "name": "pool-stable",
             "type": "docker-image",
             "source": {
                 "repository": "concourse/pool-resource",

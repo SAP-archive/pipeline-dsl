@@ -8,7 +8,7 @@ class Pool:
 
     def resource_type(self):
         return {
-            "name": "pool_stable",
+            "name": "pool-stable",
             "type": "docker-image",
             "source": {
                 "repository": "concourse/pool-resource",
@@ -22,7 +22,7 @@ class Pool:
     def concourse(self, name):
         result = {
             "name": name,
-            "type": "pool_stable",
+            "type": "pool-stable",
             "icon": "lock",
             "source": {
                 "uri": self.uri,
