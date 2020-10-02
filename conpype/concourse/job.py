@@ -15,7 +15,7 @@ from .task import InitTask, Task
 
 
 class Job:
-    def __init__(self, name, script, init_dirs, image_resource, resource_chains, secret_manager, serial):
+    def __init__(self, name, script, init_dirs, image_resource, resource_chains, secret_manager, serial, serial_groups):
         self.name = name
         self.plan = [InitTask(init_dirs, image_resource)]
         self.image_resource = image_resource
@@ -24,6 +24,7 @@ class Job:
         self.inputs = []
         self.tasks = OrderedDict()
         self.serial = serial
+        self.serial_groups = serial_groups
         self.on_failure = None
         self.on_abort = None
         self.ensure = None
@@ -75,7 +76,8 @@ class Job:
         obj = {
             "name": self.name.replace("_", "-"),
             "plan": list(map(lambda x: x.concourse(), self.plan)),
-            "serial": self.serial
+            "serial": self.serial,
+            "serial_groups": self.serial_groups
         }
         if self.on_failure:
             obj['on_failure'] = self.on_failure.concourse()

@@ -17,7 +17,7 @@ class GithubReleaseResource:
 
 
 class GithubRelease:
-    def __init__(self, owner, repo, access_token=None, pre_release=False, release=True, github_api_url=None, github_uploads_url=None):
+    def __init__(self, owner, repo, access_token=None, pre_release=False, release=True, github_api_url=None, github_uploads_url=None, tag_filter=None, order_by=None):
         self.owner = owner
         self.repo = repo
         self.access_token = access_token
@@ -25,6 +25,8 @@ class GithubRelease:
         self.release = release
         self.github_api_url = github_api_url
         self.github_uploads_url = github_uploads_url
+        self.tag_filter= tag_filter
+        self.order_by = order_by
 
     def resource_type(self):
         return None
@@ -41,7 +43,9 @@ class GithubRelease:
                 "pre_release": self.pre_release,
                 "release": self.release,
                 "github_api_url": self.github_api_url,
-                "github_uploads_url": self.github_uploads_url
+                "github_uploads_url": self.github_uploads_url,
+                "tag_filter": self.tag_filter,
+                "order_by": self.order_by
             }
         }
         result["source"] = dict(filter(lambda x: x[1] is not None, result["source"].items()))
