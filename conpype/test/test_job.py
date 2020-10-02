@@ -12,7 +12,8 @@ class TestJobSimple(unittest.TestCase):
             self.assertDictEqual(obj, {
                 "name": "job",
                 "plan": [],
-                "serial": False
+                "serial": False,
+                "serial_groups": []
             })
 
     def test_with_hooks(self):
@@ -30,6 +31,7 @@ class TestJobSimple(unittest.TestCase):
                 "name": "job",
                 "plan": [],
                 "serial": False,
+                "serial_groups": [],
                 "on_failure": {
                     "put": "test_res_fail",
                     "params": {"param": "fail"}
@@ -87,6 +89,7 @@ class TestJobSimple(unittest.TestCase):
                     }
                 ],
                 "serial": False,
+                "serial_groups": [],
             })
 
 
@@ -124,5 +127,6 @@ class TestJobSimple(unittest.TestCase):
                     }
                 ],
                 "serial": False,
+                "serial_groups": [],
             })
                 

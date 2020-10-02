@@ -95,7 +95,7 @@ class Pipeline():
             raise Exception("Job " + job + " not found. List of available jobs: " +
                             " ".join(list(self.jobs_by_name.keys())))
 
-    def job(self, name, serial=False, serial_groups=None):
+    def job(self, name, serial=False, serial_groups=[]):
         result = Job(name, self.script, self.init_dirs, self.image_resource,
                      self.resource_chains, self.__create_secret_manager(), serial=serial, serial_groups=serial_groups)
         self.jobs.append(result)
