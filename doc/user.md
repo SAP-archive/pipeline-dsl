@@ -85,7 +85,7 @@ You can use output folders for your tasks. Therefore, you can use the `outputs` 
 
 In a local environment, this folder will be located in `/tmp/outputs/<job>/<output>`. If running inside concourse, this path will be located inside your workspace.
 
-```
+```python
 @job.task(outputs=["out"])
 def tag(out):
     with open(os.path.join(out,"tag"), "w") as file:
@@ -100,7 +100,7 @@ with pipeline.job("bump-cf4k8s-templates", serial=True) as job:
     job.get("my-repo")
 
     @job.task(outputs=["publish"], timeout="45m")
-    def do_sth_with_repo(**kwargs):
+    def do_sth_with_repo(publish):
         # Copy my-repo to publish/my-repo
         # Work on publish/my-repo
     
