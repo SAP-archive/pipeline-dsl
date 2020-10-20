@@ -97,12 +97,11 @@ def tag(out):
 Resources can also execute `put` tasks:
 ```python
 with pipeline.job("bump-cf4k8s-templates", serial=True) as job:
-    job.get("my-repo")
+    source = job.get("my-repo")
 
     @job.task(outputs=["publish"], timeout="45m")
     def do_sth_with_repo(publish):
-        # Copy my-repo to publish/my-repo
-        # Work on publish/my-repo
+        shutil.copytree(source.path,publish)
     
     job.put("my-repo", params={"repository": "publish/my-repo", "rebase": True})
 ```
@@ -151,6 +150,18 @@ In this case
 You can use `pipeline.path_append(dir)` to package a library within your pipeline. This command 
 * includes all `*.py` files from the specified directory to the pipeline
 * sets the system path `sys.path.append(dir)` in a way that this path will be searched automatically.
+
+```python
+with pipeline.job("mylib-job") as job:
+  pipeline.path_append("/usr/local/lib/kubernetes")
+
+  from kubernetes import client, config
+  @job.task()
+  def task():
+    v1 = client.CoreV1Api()
+    print("Listing pods with their IPs:")
+    ret = v1.list_pod_for_all_namespaces(watch=False)
+```
 
 ### Loading code from repositories
 

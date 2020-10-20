@@ -7,17 +7,12 @@ theme: undercover
 
 ---
 
-## History
+## The Story
 
 ### 1. Plain concourse configuration
 
-* Huge configuration files
-* Violates "Don't repeat yourself" principle
-* Requires "commit before test" in case of modularisation
-* No reuse of code accross tasks and jobs
-* Linting not possible
 
-<pre style="font-size: 30%; color: green">
+```yaml
 task: install
 privileged: false
 timeout: 5m
@@ -35,20 +30,26 @@ config:
     - ceu
     - |
       kubectl ...
-</pre>
+```
+
+---
+
+### The problems 
+
+* Huge configuration files
+* Violates "Don't repeat yourself" principle
+* Requires "commit before test" when using external scripts
+* No reuse of code accross tasks and jobs
+* Linting not possible
+* No local testing
 
 ---
 
 ### 2. Use ytt
 
-* Huge configuration files
 * ~~Violates "Don't repeat yourself" principle~~
-* Requires "commit before test" in case of modularisation
-* No reuse of code accross tasks and jobs
-* Linting not possible
-* No local testing
 
-<pre style="font-size: 30%; color: green">
+```yaml
 #@ def images_resource()
 source:
   repository: python
@@ -71,46 +72,36 @@ config:
     - ceu
     - |
       kubectl ...
-</pre>
+```
 
 ---
 
-### 3. Package scripts
+### 3. Package helper scripts
 
-* Huge configuration files
-* ~~Violates "Don't repeat yourself" principle~~
 * ~~Requires "commit before test" in case of modularisation~~
-* No reuse of code accross tasks and jobs
-* Linting not possible
-* No local testing
 
-<pre style="font-size: 30%; color: green">
-#@ def images_resource()
-source:
-  repository: python
-  tag: 3.8-buster
-#@ end
+```yaml
 task: install
 privileged: false
 timeout: 5m
 config:
   caches: []
-  image_resource: #@ image_resource()
-  inputs: ...
-  outputs: ...
-  params:
-    REQUESTS_CA_BUNDLE: /etc/ssl/certs/ca-certificates.crt
-    SCRIPTS: |
-      QlpoOTFBWSZTWUWSFTsAVFB
   platform: linux
   run:
     args:
     - /bin/bash
     - ceu
     - |
-      echo ((SCRIPTS)) | base64 -d | tar -C bin -xvjf -
-      bin/install.sh
-</pre>
+      echo ((PIPELINE_DATA)) | base64 -d | tar -C bin -xvjf -
+      ...
+      bin/install_helper.sh
+      ...
+```
+```
+fly ... --var=PIPELINE_DATA=$(tar ...)
+
+```
+
 
 ---
 
@@ -121,84 +112,77 @@ config:
 * To much focus on local testing
 * Was not considered to ease pipeline development
 
+=> put more effort in reuse and local testing with current approach
+
 ---
 
 ### 4. Move all scripts into separate files
 
-* Huge configuration files
-* ~~Violates "Don't repeat yourself" principle~~
-* ~~Requires "commit before test" in case of modularisation~~
-* **No reuse of code accross tasks and jobs**
+* *No reuse of code across tasks and jobs*
 * ~~Linting not possible~~
-* **No local testing**
+* *No local testing*
 
-<pre style="font-size: 30%; color: green">
-#@ def images_resource()
-source:
-  repository: python
-  tag: 3.8-buster
-#@ end
+```yaml
 task: install
 privileged: false
 timeout: 5m
 config:
   caches: []
-  image_resource: #@ image_resource()
+  image_resource: ...
   inputs: ...
   outputs: ...
-  params:
-    REQUESTS_CA_BUNDLE: /etc/ssl/certs/ca-certificates.crt
-    SCRIPTS: |
-      QlpoOTFBWSZTWUWSFTsAVFB
+  params: ...
   platform: linux
   run:
     args:
     - /bin/bash
     - ceu
     - |
-      echo ((SCRIPTS)) | base64 -d | tar -C bin -xvjf -
+      echo ((PIPELINE_DATA)) | base64 -d | tar -C bin -xvjf -
       bin/install.sh
-</pre>
+```
 
 ---
 
 ### 5. Move all scripts back to YAML and run shellcheck
 
-* Huge configuration files
-* ~~Violates "Don't repeat yourself" principle~~
-* ~~Requires "commit before test" in case of modularisation~~
-* No reuse of code accross tasks and jobs
 * ~~Linting not possible~~
-* No local testing
 
-<pre style="font-size: 30%; color: green">
-#@ def images_resource()
-source:
-  repository: python
-  tag: 3.8-buster
-#@ end
+```yaml
 task: install
 privileged: false
 timeout: 5m
 config:
   caches: []
-  image_resource: #@ image_resource()
+  image_resource: ...
   inputs: ...
   outputs: ...
-  params:
-    REQUESTS_CA_BUNDLE: /etc/ssl/certs/ca-certificates.crt
+  params: ...
   platform: linux
   run:
     args:
     - /bin/bash
     - ceu
     - |
+      export KUBECONFIG=...
       kubectl ...
-</pre>
+```
 
 ---
 
-### 6. Use conpype
+### Summary
+
+* Huge configuration files
+* ~~Violates "Don't repeat yourself" principle~~
+* ~~Requires "commit before test" when using external scripts~~
+* No reuse of code accross tasks and jobs
+* ~~Linting not possible~~
+* No local testing
+* *ytt code is hard to maintain*
+
+--- 
+
+## conpype
 
 * ~~Huge configuration files~~
 * ~~Violates "Don't repeat yourself" principle~~
@@ -232,7 +216,7 @@ Install cf-for-k8s
 from conpype import *
 
 with Pipeline("cf-for-k8s") as pipeline:
-    pipeline.resource("cf-for-k8s-scp", GithubToolsRepo("https://github.tools.sap/cki/cf-for-k8s-scp", 
+    pipeline.resource("cf-for-k8s-scp", GitRepo("https://github.tools.sap/cki/cf-for-k8s-scp", 
                       branch="release",
                       username="istio-serviceuser",
                       password="((GITHUB_TOOLS_SAP_TOKEN))",
@@ -262,6 +246,8 @@ class GithubToolsRepo(GitRepo):
                          password="((GITHUB_TOOLS_SAP_TOKEN))",
                          git_config={"user.name": "istio-serviceuser", "user.email": "istio@sap.com"})
 
+with Pipeline("cf-for-k8s") as pipeline:  
+  pipeline.resource("cf-for-k8s-scp", GithubToolsRepo("cki/cf-for-k8s-scp", branch="0.7"))
 ```
 
 ---
@@ -269,6 +255,7 @@ class GithubToolsRepo(GitRepo):
 ## Implement a task to install cf-for-k8s
 
 ```python
+cf_for_k8s = job.get("cf-for-k8s-scp")
 @job.task(secrets={"kubeconfig_content": "DEMO_KUBECONFIG_CONTENT"})
 def install(kubeconfig_content):
     kubeconfig = "/tmp/kube.config"
@@ -333,6 +320,14 @@ with Pipeline("cf-for-k8s", image_resource = IMAGE_RESOURCE) as pipeline:
 
 ---
 
+## Concourse execution
+
+* Run `./cf-for-k8s.py --target demo`
+* Scripts are unpackaged inside `init` task
+* Task are started with `./starter/cf-for-k8s.py --job install --task install --concourse` inside concourse
+
+---
+
 # Supported features
 
 See [user documentation](https://github.tools.sap/cki/conpype/blob/develop/doc/user.md)
@@ -350,6 +345,7 @@ with pipeline.job("hello-job", timeout="5m") as job:
 ```
 
 * All configuration values can be passed as named values (e.g. `timeout`)
+* `conpype` also support `in_parallel`, `serial` and `serial_group`
 
 ---
 
@@ -414,7 +410,7 @@ class Cron:
 ```
 ---
 
-## Passed setting on resources
+## `passed` setting on resources
 
 
 ```python
@@ -427,9 +423,13 @@ with Pipeline("cf-for-k8s", image_resource = IMAGE_RESOURCE) as pipeline:
     with pipeline.job("test") as job:
         cf_for_k8s = job.get("cf-for-k8s-scp")
 
+    with pipeline.job("release") as job:
+        cf_for_k8s = job.get("cf-for-k8s-scp",passed=[])
+
 ```
 
 * Concourse automatically fills the `passed` definition of resources if they are used in subsequent jobs
+* It's also possible to override this behavior by passing `passed` to `job.get`
 
 ---
 
@@ -452,15 +452,78 @@ def tag(out):
 
 ```python
 with pipeline.job("bump-cf4k8s-templates", serial=True) as job:
-    job.get("my-repo")
+    source = job.get("my-repo")
 
     @job.task(outputs=["publish"], timeout="45m")
     def do_sth_with_repo(publish):
-        # Copy my-repo to publish/my-repo
-        # Work on publish/my-repo
+        shutil.copytree(source.path,publish)
     
     job.put("my-repo", params={"repository": "publish/my-repo", "rebase": True})
 ```
+
+* `params` can be taken from corresponding documentation of the resource type
+
+
+---
+
+### Using shell scripts
+
+```python
+with Pipeline("test",script_dirs={"myscripts":"../bin"}) as pipeline:
+    with pipeline.job("job") as job:
+
+        @job.task()
+        def task():
+            script_dir = pipeline.script_dir("myscripts")
+            shell([os.path.join(script_dir),"task.sh"])
+```
+
+* Scripts located in the directory specified by `script_dirs` are packaged into the pipeline definition
+* The directory inside the task can be located with `pipeline.script_dir`
+
+---
+
+# Using external python libraries
+
+```python
+with pipeline.job("mylib-job") as job:
+  pipeline.path_append("/usr/local/lib/kubernetes")
+
+  from kubernetes import client, config
+
+  @job.task()
+  def task():
+    v1 = client.CoreV1Api()
+    print("Listing pods with their IPs:")
+    ret = v1.list_pod_for_all_namespaces(watch=False)
+```
+
+* Use `pipeline.path_append` to package the python library into the pipeline
+* `pipeline.path_append` also adjusts the `PYTHONPATH`
+
+---
+
+### Loading python code from repositories
+
+```python
+with pipeline.job("mylib-job") as job:
+    mylib = job.get("mylib")
+
+    @job.task()
+    def mylib_task():
+        sys.path.append(mylib.path)
+        ...
+```
+
+---
+
+# Summary
+
+* `conpype` is a great improvement in writing concourse pipelines
+* Writing pipelines is a little bit more fun
+* It took longer than expected to convert the pipelines to `conpype`
+* It fulfills *our* requirements
+* Contributions are welcome
 
 ---
 
