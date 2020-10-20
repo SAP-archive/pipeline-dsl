@@ -448,7 +448,7 @@ def tag(out):
 
 ---
 
-### Put a resource
+## Put a resource
 
 ```python
 with pipeline.job("bump-cf4k8s-templates", serial=True) as job:
@@ -466,7 +466,7 @@ with pipeline.job("bump-cf4k8s-templates", serial=True) as job:
 
 ---
 
-### Using shell scripts
+## Using shell scripts
 
 ```python
 with Pipeline("test",script_dirs={"myscripts":"../bin"}) as pipeline:
@@ -483,7 +483,7 @@ with Pipeline("test",script_dirs={"myscripts":"../bin"}) as pipeline:
 
 ---
 
-# Using external python libraries
+## Using external python libraries
 
 ```python
 with pipeline.job("mylib-job") as job:
@@ -503,7 +503,7 @@ with pipeline.job("mylib-job") as job:
 
 ---
 
-### Loading python code from repositories
+## Loading python code from repositories
 
 ```python
 with pipeline.job("mylib-job") as job:
