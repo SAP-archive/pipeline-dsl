@@ -110,7 +110,7 @@ Upstream resource documentation: https://github.com/concourse/semver-resource/bl
 
 Example:
 ```python
-SemVer(driver=<see below>, initial_version="0.42.0")
+SemVer(source=<see below>, initial_version="0.42.0")
 ```
 
 After `get`ting the resource the following methods are available:
@@ -130,5 +130,5 @@ Note: Only `owner`, `repo`, `access_token`, `pre_release`, `release`, `github_ap
 
 Example:
 ```python
- SemVer(driver = SemVerGitDriver("https://github.com/concourse/version", username="((GITHUB_USER))", password="((GITHUB_TOKEN))", branch="version", file="version"))
+ SemVer(source = SemVerGitDriver("https://github.com/concourse/version", username="((GITHUB_USER))", password="((GITHUB_TOKEN))", branch="version", file="version"))
 ```

@@ -15,7 +15,7 @@ DEFAULT_IMAGE = {"type": "docker-image",
 
 with Pipeline("conpype", team="garden", image_resource=DEFAULT_IMAGE) as pipeline:
     pipeline.resource("conpype", GitRepo("https://github.tools.sap/cki/conpype",
-        username="istio-serviceuser", password="((GITHUB_TOOLS_SAP_TOKEN))", ignore_paths=["concourse/*"], branch="develop"))
+        username="istio-serviceuser", password="((GITHUB_TOOLS_SAP_TOKEN))", ignore_paths=["concourse/*", "doc/*"], branch="develop"))
 
     pipeline.resource("conpype-main", GitRepo("https://github.tools.sap/cki/conpype",
         username="istio-serviceuser", password="((GITHUB_TOOLS_SAP_TOKEN))", ignore_paths=["concourse/*"], branch="main"))
