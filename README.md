@@ -13,7 +13,7 @@
 ## Installation
 
 ```bash
-pip install git+https://github.tools.sap/cki/conpype.git@main
+pip install --upgrade git+https://github.tools.sap/cki/conpype.git@main
 ```
 
 ## Example
