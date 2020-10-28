@@ -15,8 +15,9 @@ from .task import InitTask, Task
 
 
 class Job:
-    def __init__(self, name, script, init_dirs, image_resource, resource_chains, secret_manager, serial, serial_groups):
+    def __init__(self, name, script, init_dirs, image_resource, resource_chains, secret_manager, serial, serial_groups, old_name):
         self.name = name
+        self.old_name = old_name
         self.plan = [InitTask(init_dirs, image_resource)]
         self.image_resource = image_resource
         self.resource_chains = resource_chains
@@ -85,6 +86,8 @@ class Job:
             obj['on_abort'] = self.on_abort.concourse()
         if self.ensure:
             obj['ensure'] = self.ensure.concourse()
+        if self.old_name:
+            obj['old_name'] = self.old_name
         return obj
 
     def __cleanup_outputs(self):
