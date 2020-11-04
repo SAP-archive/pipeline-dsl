@@ -168,6 +168,17 @@ class ParallelStep:
     def __exit__(self, type, value, tb):
         return None
 
+    def get(self, name, trigger=False, passed="auto", params=None):
+        resource_chain = self.job.resource_chains.get(name,None)
+        if not resource_chain:
+            raise Exception("Resource " + name + " not configured for pipeline")
+        if passed == "auto":
+            passed = resource_chain.passed.copy()
+        self.tasks.append(GetStep(name, trigger, passed, params))
+        resource_chain.passed.append(self.job.name)
+        self.job.inputs.append(name)
+        return resource_chain.resource.get(name)
+
     def put(self, name, params=None):
         self.tasks.append(PutStep(name, params))
 
