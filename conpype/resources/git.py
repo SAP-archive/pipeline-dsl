@@ -22,7 +22,7 @@ class GitRepoResource:
             with open(os.path.join(self.path, ".git/ref")) as f:
                 return f.read().strip()
         try:
-            return subprocess.check_output(["git", "describe", "--tags"], cwd=self.path).decode("utf-8").strip()
+            return subprocess.check_output(["git", "describe", "--tags"], cwd=self.path,stderr=subprocess.DEVNULL).decode("utf-8").strip()
         except:
             return subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=self.path).decode("utf-8").strip()
 
