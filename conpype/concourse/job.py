@@ -26,6 +26,7 @@ class Job:
         self.tasks = OrderedDict()
         self.serial = serial
         self.serial_groups = serial_groups
+        self.on_success = None
         self.on_failure = None
         self.on_abort = None
         self.ensure = None
@@ -80,6 +81,8 @@ class Job:
             "serial": self.serial,
             "serial_groups": self.serial_groups
         }
+        if self.on_success:
+            obj['on_success'] = self.on_success.concourse()
         if self.on_failure:
             obj['on_failure'] = self.on_failure.concourse()
         if self.on_abort:
