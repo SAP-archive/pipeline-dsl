@@ -107,7 +107,12 @@ class Job:
 
     def run_task(self, name):
         self.__cleanup_outputs()
-        return self.tasks[name].fn_cached()
+        task = self.tasks.get(name,None)
+        if not task:
+            task = self.tasks.get(name.replace("_","-"),None)
+        if not task:
+           raise Exception(f"Task {name} not configured inside job {self.name}")
+        return task.fn_cached()
 
 class GetStep:
     def __init__(self, name, trigger, passed, params):

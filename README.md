@@ -13,6 +13,7 @@
 ## Installation
 
 ```bash
+brew install gnu-tar
 pip install --upgrade git+https://github.tools.sap/cki/conpype.git@main
 ```
 
