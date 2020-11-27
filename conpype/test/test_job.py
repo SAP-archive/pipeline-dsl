@@ -134,4 +134,50 @@ class TestJobSimple(unittest.TestCase):
                 "serial": False,
                 "serial_groups": [],
             })
-                
+
+    def test_do(self):
+        with Pipeline("test",script_dirs={"fake":"fake_scripts"}) as pipeline:
+            pipeline.resource("res-1", GitRepo("https://example.com/repo.git"))
+            pipeline.resource("res-2", GitRepo("https://example.com/repo.git"))
+
+            job = pipeline.job("job")
+
+            job.get("res-1", False, ["testjob"], params={"test": 1})
+            job.get("res-2", True, ["testjob2"], params={"test": 2})
+
+            job.ensure = DoStep([PutStep("res-1", {"test": 3}), PutStep("res-2", {"test": 4})])
+
+            obj = job.concourse()
+
+            obj["plan"] = obj["plan"][1:] # remove init task. it is checked test_pipeline.py
+            self.assertDictEqual(obj, {
+                "name": "job",
+                "plan": [
+                    {
+                        "get": "res-1",
+                        "trigger": False,
+                        "passed": ["testjob"],
+                        "params": {"test": 1}
+                    },
+                    {
+                        "get": "res-2",
+                        "trigger": True,
+                        "passed": ["testjob2"],
+                        "params": {"test": 2}
+                    }
+                ],
+                "serial": False,
+                "serial_groups": [],
+                "ensure": {
+                    "do": [
+                        {
+                            "put": "res-1",
+                            "params": {"test": 3}
+                        },
+                        {
+                            "put": "res-2",
+                            "params": {"test": 4}
+                        }
+                    ]
+                }
+            })

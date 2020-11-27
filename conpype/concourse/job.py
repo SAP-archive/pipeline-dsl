@@ -152,6 +152,15 @@ class TryStep:
             "try": self.task.concourse()
         }
 
+class DoStep:
+    def __init__(self, tasks):
+        self.tasks = tasks
+
+    def concourse(self):
+        return {
+            "do": [task.concourse() for task in self.tasks]
+        }
+
 class ParallelStep:
     def __init__(self, job, fail_fast, secret_manager=None):
         self.job = job
