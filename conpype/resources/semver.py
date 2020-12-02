@@ -31,7 +31,7 @@ class SemVer:
             "source": self.source.concourse()
         }
         if self.initial_version != None:
-            result["initial_version"] = self.initial_version
+            result["source"]["initial_version"] = self.initial_version
         return result
 
     def get(self, name):
