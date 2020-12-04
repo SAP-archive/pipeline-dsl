@@ -58,12 +58,12 @@ class Job:
         self.inputs.append(name)
         return resource_chain.resource.get(name)
 
-    def task(self, timeout="5m", privileged=False, image_resource=None, resources=[], secrets={}, outputs=[], attempts=1, caches=[], name=None):
+    def task(self, timeout="5m", privileged=False, image_resource=None, resources=[], secrets={}, outputs=[], attempts=1, caches=[], name=None, env={}):
         if not image_resource:
             image_resource = self.image_resource
 
         def decorate(fun):
-            task = Task(fun, self.name, timeout, privileged, image_resource, self.script, self.inputs, outputs, secrets, attempts, caches, name, self.secret_manager)
+            task = Task(fun, self.name, timeout, privileged, image_resource, self.script, self.inputs, outputs, secrets, attempts, caches, name, self.secret_manager, env)
             self.plan.append(task)
             self.tasks[task.name] = task
             return task.fn_cached
@@ -168,12 +168,12 @@ class ParallelStep:
         self.fail_fast = fail_fast
         self.secret_manager = secret_manager
 
-    def task(self, timeout="5m", privileged=False, image_resource=None, resources=[], secrets={}, outputs=[], attempts=1, caches=[], name=None):
+    def task(self, timeout="5m", privileged=False, image_resource=None, resources=[], secrets={}, outputs=[], attempts=1, caches=[], name=None, env={}):
         if not image_resource:
             image_resource = self.job.image_resource
 
         def decorate(fun):
-            task = Task(fun, self.job.name, timeout, privileged, image_resource, self.job.script, self.job.inputs, outputs, secrets, attempts, caches, name, self.secret_manager)
+            task = Task(fun, self.job.name, timeout, privileged, image_resource, self.job.script, self.job.inputs, outputs, secrets, attempts, caches, name, self.secret_manager, env)
             self.tasks.append(task)
             self.job.tasks[task.name] = task
             return task.fn_cached

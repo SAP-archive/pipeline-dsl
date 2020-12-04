@@ -15,7 +15,7 @@ STARTER_DIR = "starter"
 PYTHON_DIR = "pythonpath"
 
 class Task:
-    def __init__(self, fun, jobname, timeout, privileged, image_resource, script, inputs, outputs, secrets, attempts, caches, name, secret_manager):
+    def __init__(self, fun, jobname, timeout, privileged, image_resource, script, inputs, outputs, secrets, attempts, caches, name, secret_manager, env):
         if not name:
             name = fun.__name__.replace("_", "-")
         self.name = name
@@ -34,7 +34,7 @@ class Task:
                        **{
                 "PYTHONPATH": f"{SCRIPT_DIR}/{PYTHON_DIR}:{SCRIPT_DIR}/{STARTER_DIR}:/usr/local/lib/python/garden-tools",
                 "REQUESTS_CA_BUNDLE": '/etc/ssl/certs/ca-certificates.crt'
-            }},
+            }, **env},
             "run": {
                 "path": "/usr/bin/python3",
                 "args": [os.path.join(SCRIPT_DIR, STARTER_DIR, os.path.basename(script)), "--job", jobname, "--task", name,"--concourse"],
