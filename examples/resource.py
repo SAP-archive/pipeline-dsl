@@ -1,8 +1,8 @@
-from conpype import *
+from conpype import Pipeline, GitRepo
 
 with Pipeline("kubernetes") as pipeline:
     pipeline.resource("kubernetes", GitRepo("https://github.com/kubernetes/kubernetes"))
-   
+
     with pipeline.job("kube-job") as job:
         kubernetes = job.get("kubernetes")
 

@@ -1,5 +1,5 @@
 class Cron:
-    def __init__(self,definition):
+    def __init__(self, definition):
         self.definition = definition
 
     def resource_type(self):
@@ -9,8 +9,9 @@ class Cron:
             "source": {
                 "repository": "phil9909/concourse-cron-resource",
                 "tag": "latest",
-            }
+            },
         }
+
     def concourse(self, name):
         return {
             "name": name,
@@ -19,7 +20,7 @@ class Cron:
             "source": {
                 "cron": self.definition,
                 "location": "Europe/Berlin",
-            }
+            },
         }
 
     def get(self, name):

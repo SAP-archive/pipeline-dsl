@@ -1,6 +1,7 @@
 import os
 from conpype.concourse import concourse_context
 
+
 class SemVerResource:
     def __init__(self, name):
         self.name = name
@@ -15,6 +16,7 @@ class SemVerResource:
                 return f.read().strip()
         return "0.0.1"
 
+
 class SemVer:
     def __init__(self, source, initial_version=None):
         self.source = source
@@ -28,9 +30,9 @@ class SemVer:
             "name": name,
             "type": "semver",
             "icon": "creation",
-            "source": self.source.concourse()
+            "source": self.source.concourse(),
         }
-        if self.initial_version != None:
+        if self.initial_version is not None:
             result["source"]["initial_version"] = self.initial_version
         return result
 
@@ -66,11 +68,10 @@ class SemVerGitDriver:
             "git_user": self.git_user,
             "depth": self.depth,
             "skip_ssl_verification": self.skip_ssl_verification,
-            "commit_message": self.commit_message
+            "commit_message": self.commit_message,
         }
 
         return dict(filter(lambda x: x[1] is not None, result.items()))
 
     def get(self, name):
         return None
-        

@@ -1,13 +1,5 @@
-import sys
-import os
-import json
-import shutil
 import subprocess
-import platform
-import base64
-import glob
-import inspect
-from collections import OrderedDict
+
 
 class Password:
     def __init__(self, password):
@@ -20,6 +12,9 @@ class Password:
 def shell(cmd, check=True, cwd=None, capture_output=False, input=None):
     stdout = stderr = subprocess.PIPE if capture_output else None
 
-    print(" ".join(
-        list(map(lambda x: "<redacted>" if isinstance(x, Password) else str(x), cmd))))
+    print(
+        " ".join(
+            list(map(lambda x: "<redacted>" if isinstance(x, Password) else str(x), cmd)),
+        )
+    )
     return subprocess.run(list(map(lambda x: str(x), cmd)), check=check, cwd=cwd, stdout=stdout, stderr=stderr, input=input)

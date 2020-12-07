@@ -1,6 +1,7 @@
 import os
 from conpype.concourse import concourse_context, subprocess
 
+
 class GitRepoResource:
     def __init__(self, name, uri, config):
         self.name = name
@@ -22,8 +23,8 @@ class GitRepoResource:
             with open(os.path.join(self.path, ".git/ref")) as f:
                 return f.read().strip()
         try:
-            return subprocess.check_output(["git", "describe", "--tags"], cwd=self.path,stderr=subprocess.DEVNULL).decode("utf-8").strip()
-        except:
+            return subprocess.check_output(["git", "describe", "--tags"], cwd=self.path, stderr=subprocess.DEVNULL).decode("utf-8").strip()
+        except Exception:
             return subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=self.path).decode("utf-8").strip()
 
     def short_ref(self):
@@ -60,8 +61,8 @@ class GitRepo:
                 "paths": self.paths,
                 "ignore_paths": self.ignore_paths,
                 "tag_filter": self.tag_filter,
-                "git_config" : list(map(lambda kv: { "name" : kv[0], "value": kv[1]}, self.git_config.items()))
-            }
+                "git_config": list(map(lambda kv: {"name": kv[0], "value": kv[1]}, self.git_config.items())),
+            },
         }
         result["source"] = dict(filter(lambda x: x[1] is not None, result["source"].items()))
         return result

@@ -8,12 +8,10 @@ with Pipeline("c21s") as pipeline:
         shalm_dir = job.get("shalm")
         cluster_name = "xxx"
 
-
         @job.task()
         def create_shoot():
             print("Create cluster {}".format(cluster_name))
             return cluster_name
-
 
         @job.task(secrets={"home": "HOME"})
         def install_shalm(home=None):
@@ -21,7 +19,5 @@ with Pipeline("c21s") as pipeline:
             print("Installing shalm {} into {}".format(shalm_dir, create_shoot()))
             return "Hello"
 
-
         job = pipeline.job("test-cluster")
         shalm_dir = job.get("shalm")
-

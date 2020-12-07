@@ -13,7 +13,7 @@ class Pool:
             "source": {
                 "repository": "concourse/pool-resource",
                 "tag": "1.1.1",
-            }
+            },
         }
 
     def get(self, name):
@@ -30,6 +30,6 @@ class Pool:
                 "pool": self.pool,
                 "username": self.username,
                 "password": self.password,
-            }
+            },
         }
         return result

@@ -1,13 +1,5 @@
-
-import sys
 import os
-import json
 import shutil
-import subprocess
-import platform
-import base64
-import glob
-import inspect
 from collections import OrderedDict
 
 from .__shared import concourse_context
@@ -39,7 +31,7 @@ class Job:
         return None
 
     def get(self, name, trigger=False, passed="auto", params=None):
-        resource_chain = self.resource_chains.get(name,None)
+        resource_chain = self.resource_chains.get(name, None)
         if not resource_chain:
             raise Exception("Resource " + name + " not configured for pipeline")
         if passed == "auto":
@@ -50,7 +42,7 @@ class Job:
         return resource_chain.resource.get(name)
 
     def put(self, name, params=None):
-        resource_chain = self.resource_chains.get(name,None)
+        resource_chain = self.resource_chains.get(name, None)
         if not resource_chain:
             raise Exception("Resource " + name + " not configured for pipeline")
         self.plan.append(PutStep(name, params))
@@ -67,6 +59,7 @@ class Job:
             self.plan.append(task)
             self.tasks[task.name] = task
             return task.fn_cached
+
         return decorate
 
     def in_parallel(self, fail_fast=False):
@@ -79,18 +72,18 @@ class Job:
             "name": self.name.replace("_", "-"),
             "plan": list(map(lambda x: x.concourse(), self.plan)),
             "serial": self.serial,
-            "serial_groups": self.serial_groups
+            "serial_groups": self.serial_groups,
         }
         if self.on_success:
-            obj['on_success'] = self.on_success.concourse()
+            obj["on_success"] = self.on_success.concourse()
         if self.on_failure:
-            obj['on_failure'] = self.on_failure.concourse()
+            obj["on_failure"] = self.on_failure.concourse()
         if self.on_abort:
-            obj['on_abort'] = self.on_abort.concourse()
+            obj["on_abort"] = self.on_abort.concourse()
         if self.ensure:
-            obj['ensure'] = self.ensure.concourse()
+            obj["ensure"] = self.ensure.concourse()
         if self.old_name:
-            obj['old_name'] = self.old_name
+            obj["old_name"] = self.old_name
         return obj
 
     def __cleanup_outputs(self):
@@ -107,12 +100,13 @@ class Job:
 
     def run_task(self, name):
         self.__cleanup_outputs()
-        task = self.tasks.get(name,None)
+        task = self.tasks.get(name, None)
         if not task:
-            task = self.tasks.get(name.replace("_","-"),None)
+            task = self.tasks.get(name.replace("_", "-"), None)
         if not task:
-           raise Exception(f"Task {name} not configured inside job {self.name}")
+            raise Exception(f"Task {name} not configured inside job {self.name}")
         return task.fn_cached()
+
 
 class GetStep:
     def __init__(self, name, trigger, passed, params):
@@ -127,7 +121,7 @@ class GetStep:
             "trigger": self.trigger,
             "passed": self.passed,
         }
-        if self.params != None:
+        if self.params is not None:
             result["params"] = self.params
         return result
 
@@ -143,14 +137,16 @@ class PutStep:
             "params": self.params,
         }
 
+
 class TryStep:
     def __init__(self, task):
         self.task = task
 
     def concourse(self):
         return {
-            "try": self.task.concourse()
+            "try": self.task.concourse(),
         }
+
 
 class DoStep:
     def __init__(self, tasks):
@@ -158,8 +154,9 @@ class DoStep:
 
     def concourse(self):
         return {
-            "do": [task.concourse() for task in self.tasks]
+            "do": [task.concourse() for task in self.tasks],
         }
+
 
 class ParallelStep:
     def __init__(self, job, fail_fast, secret_manager=None):
@@ -177,6 +174,7 @@ class ParallelStep:
             self.tasks.append(task)
             self.job.tasks[task.name] = task
             return task.fn_cached
+
         return decorate
 
     def __enter__(self):
@@ -186,7 +184,7 @@ class ParallelStep:
         return None
 
     def get(self, name, trigger=False, passed="auto", params=None):
-        resource_chain = self.job.resource_chains.get(name,None)
+        resource_chain = self.job.resource_chains.get(name, None)
         if not resource_chain:
             raise Exception("Resource " + name + " not configured for pipeline")
         if passed == "auto":
@@ -203,6 +201,6 @@ class ParallelStep:
         return {
             "in_parallel": {
                 "fail_fast": self.fail_fast,
-                "steps": [task.concourse() for task in self.tasks]
-            }
+                "steps": [task.concourse() for task in self.tasks],
+            },
         }

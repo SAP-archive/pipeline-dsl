@@ -1,18 +1,15 @@
-import sys
 import os
 import json
-import shutil
 import subprocess
 import platform
 import base64
 import glob
-import inspect
-from collections import OrderedDict
 
 from .__shared import CACHE_DIR, SCRIPT_DIR, concourse_context
 
 STARTER_DIR = "starter"
 PYTHON_DIR = "pythonpath"
+
 
 class Task:
     def __init__(self, fun, jobname, timeout, privileged, image_resource, script, inputs, outputs, secrets, attempts, caches, name, secret_manager, env):
@@ -28,17 +25,20 @@ class Task:
             "platform": "linux",
             "image_resource": image_resource,
             "outputs": [{"name": CACHE_DIR}] + list(map(lambda x: {"name": x}, outputs)),
-            "inputs": [{"name": CACHE_DIR},  {"name": SCRIPT_DIR}] + list(map(lambda x: {"name": x}, inputs)),
+            "inputs": [{"name": CACHE_DIR}, {"name": SCRIPT_DIR}] + list(map(lambda x: {"name": x}, inputs)),
             "caches": [{"path": cache} for cache in self.caches],
-            "params": {**dict(map(lambda kv: (str(kv[1]), '(({}))'.format(str(kv[1]))), secrets.items())),
-                       **{
-                "PYTHONPATH": f"{SCRIPT_DIR}/{PYTHON_DIR}:{SCRIPT_DIR}/{STARTER_DIR}:/usr/local/lib/python/garden-tools",
-                "REQUESTS_CA_BUNDLE": '/etc/ssl/certs/ca-certificates.crt'
-            }, **env},
+            "params": {
+                **dict(map(lambda kv: (str(kv[1]), "(({}))".format(str(kv[1]))), secrets.items())),
+                **{
+                    "PYTHONPATH": f"{SCRIPT_DIR}/{PYTHON_DIR}:{SCRIPT_DIR}/{STARTER_DIR}:/usr/local/lib/python/garden-tools",
+                    "REQUESTS_CA_BUNDLE": "/etc/ssl/certs/ca-certificates.crt",
+                },
+                **env,
+            },
             "run": {
                 "path": "/usr/bin/python3",
-                "args": [os.path.join(SCRIPT_DIR, STARTER_DIR, os.path.basename(script)), "--job", jobname, "--task", name,"--concourse"],
-            }
+                "args": [os.path.join(SCRIPT_DIR, STARTER_DIR, os.path.basename(script)), "--job", jobname, "--task", name, "--concourse"],
+            },
         }
         cache_file = os.path.join(CACHE_DIR, jobname, name + ".json")
 
@@ -59,22 +59,22 @@ class Task:
                 kwargs[out] = dir
             result = fun(**kwargs)
             os.makedirs(os.path.dirname(cache_file), exist_ok=True)
-            with open(cache_file, 'w') as fd:
+            with open(cache_file, "w") as fd:
                 json.dump(result, fd)
             return result
 
         def fn_cached():
             try:
-                with open(cache_file, 'r') as fd:
+                with open(cache_file, "r") as fd:
                     return json.load(fd)
             except FileNotFoundError:
                 try:
                     return fn()
                 except Exception as exc:
                     raise exc from None
-        self.fn = fn
-        self.fn_cached = fn # fn_cached
 
+        self.fn = fn
+        self.fn_cached = fn  # fn_cached
 
     def concourse(self):
         concourse = {
@@ -94,36 +94,35 @@ class InitTask:
         self.init_dirs = init_dirs
         self.image_resource = image_resource
 
-
     def package(self):
-        tar =  "gtar" if platform.system() == "Darwin" else "tar"
+        tar = "gtar" if platform.system() == "Darwin" else "tar"
         files = []
         transform = []
         init_dirs = sorted(list(self.init_dirs.items()), key=lambda d: len(d[1]), reverse=True)
         for dir_concourse, dir_local in init_dirs:
             dir_local = os.path.abspath(dir_local)
             transform.append(f"--transform 's|{dir_local}|{dir_concourse}|g'")
-            files = files + \
-                list(glob.glob(os.path.join(dir_local, '**', '*.[ps][yh]'), recursive=True))
+            files = files + list(glob.glob(os.path.join(dir_local, "**", "*.[ps][yh]"), recursive=True))
         cmd = f'{tar} cj --sort=name --mtime="UTC 2019-01-01" {" ".join(transform)} --owner=root:0 --group=root:0 -b 1 -P -f - {" ".join(files)}'
         return base64.b64encode(subprocess.check_output(cmd, shell=True)).decode("utf-8")
 
     def concourse(self):
-         return {
+        return {
             "task": "init",
             "config": {
                 "platform": "linux",
                 "image_resource": self.image_resource,
-                "outputs": [{"name": CACHE_DIR},  {"name": SCRIPT_DIR}],
+                "outputs": [{"name": CACHE_DIR}, {"name": SCRIPT_DIR}],
                 "run": {
                     "path": "/bin/bash",
                     "args": [
-                        '-ceu',
+                        "-ceu",
                         f'echo "{self.package()}" | base64 -d | tar -C {SCRIPT_DIR} -xvjf -',
                     ],
-                }
-            }
+                },
+            },
         }
+
 
 class OptionalSecret:
     def __init__(self, name):
@@ -131,4 +130,3 @@ class OptionalSecret:
 
     def __str__(self):
         return self.name
-

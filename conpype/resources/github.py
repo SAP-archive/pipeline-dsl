@@ -1,6 +1,7 @@
 import os
 from conpype.concourse import concourse_context
 
+
 class GithubReleaseResource:
     def __init__(self, name):
         self.name = name
@@ -25,7 +26,7 @@ class GithubRelease:
         self.release = release
         self.github_api_url = github_api_url
         self.github_uploads_url = github_uploads_url
-        self.tag_filter= tag_filter
+        self.tag_filter = tag_filter
         self.order_by = order_by
 
     def resource_type(self):
@@ -45,8 +46,8 @@ class GithubRelease:
                 "github_api_url": self.github_api_url,
                 "github_uploads_url": self.github_uploads_url,
                 "tag_filter": self.tag_filter,
-                "order_by": self.order_by
-            }
+                "order_by": self.order_by,
+            },
         }
         result["source"] = dict(filter(lambda x: x[1] is not None, result["source"].items()))
         return result

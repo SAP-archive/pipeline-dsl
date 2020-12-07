@@ -1,6 +1,7 @@
 import os
 from conpype.concourse import concourse_context
 
+
 class DockerImageResource:
     def __init__(self, name):
         self.name = name
@@ -14,6 +15,7 @@ class DockerImageResource:
             with open(os.path.join(self.path, "digest")) as f:
                 return f.read().strip()
         return "latest"
+
 
 class DockerImage:
     def __init__(self, repository, username=None, password=None, tag="latest"):
@@ -34,8 +36,8 @@ class DockerImage:
                 "repository": self.repository,
                 "username": self.username,
                 "password": self.password,
-                "tag": self.tag
-            }
+                "tag": self.tag,
+            },
         }
         result["source"] = dict(filter(lambda x: x[1] is not None, result["source"].items()))
         return result

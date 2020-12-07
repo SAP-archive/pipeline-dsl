@@ -11,7 +11,7 @@ class GoogleCloudStorage:
             "source": {
                 "repository": "frodenas/gcs-resource",
                 "tag": "latest",
-            }
+            },
         }
 
     def get(self, name):
@@ -26,7 +26,6 @@ class GoogleCloudStorage:
                 "bucket": self.bucket,
                 "regexp": self.regexp,
                 "json_key": self.credentials,
-            }
+            },
         }
         return result
-
