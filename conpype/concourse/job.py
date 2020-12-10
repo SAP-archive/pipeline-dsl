@@ -30,13 +30,13 @@ class Job:
     def __exit__(self, type, value, tb):
         return None
 
-    def get(self, name, trigger=False, passed="auto", params=None):
+    def get(self, name, trigger=False, passed="auto", params=None, version=None):
         resource_chain = self.resource_chains.get(name, None)
         if not resource_chain:
             raise Exception("Resource " + name + " not configured for pipeline")
         if passed == "auto":
             passed = resource_chain.passed.copy()
-        self.plan.append(GetStep(name, trigger, passed, params))
+        self.plan.append(GetStep(name, trigger, passed, params, version))
         resource_chain.passed.append(self.name)
         self.inputs.append(name)
         return resource_chain.resource.get(name)
@@ -109,11 +109,12 @@ class Job:
 
 
 class GetStep:
-    def __init__(self, name, trigger, passed, params):
+    def __init__(self, name, trigger, passed, params, version):
         self.name = name
         self.trigger = trigger
         self.passed = passed
         self.params = params
+        self.version = version
 
     def concourse(self):
         result = {
@@ -123,6 +124,8 @@ class GetStep:
         }
         if self.params is not None:
             result["params"] = self.params
+        if self.version is not None:
+            result["version"] = self.version
         return result
 
 
@@ -183,13 +186,13 @@ class ParallelStep:
     def __exit__(self, type, value, tb):
         return None
 
-    def get(self, name, trigger=False, passed="auto", params=None):
+    def get(self, name, trigger=False, passed="auto", params=None, version=None):
         resource_chain = self.job.resource_chains.get(name, None)
         if not resource_chain:
             raise Exception("Resource " + name + " not configured for pipeline")
         if passed == "auto":
             passed = resource_chain.passed.copy()
-        self.tasks.append(GetStep(name, trigger, passed, params))
+        self.tasks.append(GetStep(name, trigger, passed, params, version))
         resource_chain.passed.append(self.job.name)
         self.job.inputs.append(name)
         return resource_chain.resource.get(name)

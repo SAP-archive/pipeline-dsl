@@ -26,7 +26,7 @@ class TestJobSimple(unittest.TestCase):
             job.on_success = PutStep("test_res_success", {"param": "success"})
             job.on_failure = PutStep("test_res_fail", {"param": "fail"})
             job.on_abort = PutStep("test_res_abort", {"param": "abort"})
-            job.ensure = GetStep("test_res_ensure", False, ["job-1"], {"param": "ensure"})
+            job.ensure = GetStep("test_res_ensure", False, ["job-1"], {"param": "ensure"}, version="every")
 
             obj = job.concourse()
 
@@ -55,6 +55,7 @@ class TestJobSimple(unittest.TestCase):
                         "trigger": False,
                         "passed": ["job-1"],
                         "params": {"param": "ensure"},
+                        "version": "every",
                     },
                 },
             )
