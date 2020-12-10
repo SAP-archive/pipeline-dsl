@@ -56,6 +56,42 @@ class TestPipeline(unittest.TestCase):
             with concourse_ctx():
                 self.assertEqual(pipeline.script_dir("fake"), os.path.abspath("scripts/fake"))
 
+    def test_job_groups(self):
+        with Pipeline("test") as pipeline:
+            with pipeline.job("job-a", groups=["a"]) as job:
+
+                @job.task()
+                def task_a():
+                    pass
+
+            with pipeline.job("job-b", groups=["b"]) as job:
+
+                @job.task()
+                def task_b():
+                    pass
+
+            with pipeline.job("job-ab", groups=["a", "b"]) as job:
+
+                @job.task()
+                def task_ab():
+                    pass
+
+            concourse = pipeline.concourse()
+            self.assertIn("groups", concourse)
+            self.assertEqual(
+                [
+                    {
+                        "name": "a",
+                        "jobs": ["job-a", "job-ab"],
+                    },
+                    {
+                        "name": "b",
+                        "jobs": ["job-b", "job-ab"],
+                    },
+                ],
+                concourse["groups"],
+            )
+
 
 if __name__ == "__main__":
     unittest.main()
