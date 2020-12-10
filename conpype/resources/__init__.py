@@ -6,6 +6,7 @@ from conpype.resources.docker import DockerImage
 from conpype.resources.semver import SemVer, SemVerGitDriver
 from conpype.resources.cron import Cron
 from conpype.resources.registry_image import RegistryImage
+from conpype.resources.github_pr import GithubPR
 
 ConcourseLockResource = Pool
 GoogleCloudStorageResource = GoogleCloudStorage

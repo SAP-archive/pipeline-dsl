@@ -143,3 +143,23 @@ Example:
 ```python
 RegistryImage("deploy-releases.docker.repositories.sap.ondemand.com/com.sap.cloud/sb-proxy-cf-sap", "((REGISTRY_USER))", "((REGISTRY_TOKEN))")
 ```
+
+### GithubPR
+
+Upstream resource documentation: https://github.com/telia-oss/github-pr-resource/blob/master/README.md
+
+Example:
+```python
+GithubPR(repository="torvalds/linux", access_token="((GITHUB_TOKEN))")
+")
+```
+
+After `get`ting the resource the following methods are available:
+
+| method            | returns                                                          | locally                                  |
+|-------------------|------------------------------------------------------------------|------------------------------------------|
+| `name`            | the given name                                                   | the given name                           |
+| `path`            | the location where concourse stored the resource                 | unavailable                              |
+| `version()`       | parsed content of `.git/resource/version.json`                   | the `default` value passed to the method |
+| `metadata()`      | parsed content of `.git/resource/metadata.json`                  | the `default` value passed to the method |
+| `changed_files()` | array of changed files parsed from `.git/resource/changed_files` | the `default` value passed to the method |

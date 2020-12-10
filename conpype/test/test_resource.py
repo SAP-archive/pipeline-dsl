@@ -1,6 +1,6 @@
 import unittest
 import os
-from conpype.resources import GitRepo, Cron, DockerImage, GoogleCloudStorage, Pool, GithubRelease, SemVer, SemVerGitDriver, RegistryImage
+from conpype.resources import GitRepo, Cron, DockerImage, GoogleCloudStorage, Pool, GithubRelease, SemVer, SemVerGitDriver, RegistryImage, GithubPR
 from conpype.concourse.__shared import concourse_ctx
 
 
@@ -276,6 +276,28 @@ class TestRegistryImageResource(unittest.TestCase):
                     "password": "password",
                     "tag": "tag",
                     "variant": "variant",
+                },
+            },
+        )
+
+
+class TestGithubPRResource(unittest.TestCase):
+    def test_basic(self):
+        resource = GithubPR("torvalds/linux", "((GITHUB_TOKEN))", skip_ssl_verification=True, v3_endpoint="https://api.example.com")
+
+        obj = resource.concourse("test")
+
+        self.assertDictEqual(
+            obj,
+            {
+                "name": "test",
+                "type": "github-pr",
+                "icon": "source-pull",
+                "source": {
+                    "repository": "torvalds/linux",
+                    "access_token": "((GITHUB_TOKEN))",
+                    "skip_ssl_verification": True,
+                    "v3_endpoint": "https://api.example.com",
                 },
             },
         )
