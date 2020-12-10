@@ -132,3 +132,14 @@ Example:
 ```python
  SemVer(source = SemVerGitDriver("https://github.com/concourse/version", username="((GITHUB_USER))", password="((GITHUB_TOKEN))", branch="version", file="version"))
 ```
+
+### RegistryImage
+
+Upstream resource documentation: https://github.com/concourse/registry-image-resource/blob/master/README.md
+
+Note: Only `repo`, `user`, `password`, `tag` and `variant` are currently supported in source configuration
+
+Example:
+```python
+RegistryImage("deploy-releases.docker.repositories.sap.ondemand.com/com.sap.cloud/sb-proxy-cf-sap", "((REGISTRY_USER))", "((REGISTRY_TOKEN))")
+```

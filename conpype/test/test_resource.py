@@ -1,6 +1,6 @@
 import unittest
 import os
-from conpype.resources import GitRepo, Cron, DockerImage, GoogleCloudStorage, Pool, GithubRelease, SemVer, SemVerGitDriver
+from conpype.resources import GitRepo, Cron, DockerImage, GoogleCloudStorage, Pool, GithubRelease, SemVer, SemVerGitDriver, RegistryImage
 from conpype.concourse.__shared import concourse_ctx
 
 
@@ -254,6 +254,28 @@ class TestSemVerResource(unittest.TestCase):
                     "git_user": "git_user",
                     "skip_ssl_verification": True,
                     "commit_message": "Commit Message",
+                },
+            },
+        )
+
+
+class TestRegistryImageResource(unittest.TestCase):
+    def test_basic(self):
+        resource = RegistryImage("repo", "user", "password", "tag", "variant")
+
+        obj = resource.concourse("test")
+
+        self.assertDictEqual(
+            obj,
+            {
+                "name": "test",
+                "type": "registry-image",
+                "source": {
+                    "repository": "repo",
+                    "username": "user",
+                    "password": "password",
+                    "tag": "tag",
+                    "variant": "variant",
                 },
             },
         )
