@@ -128,6 +128,29 @@ with Pipeline("test",script_dirs={"myscripts":"../bin"}) as pipeline:
 
 When running locally, `Pipeline.script_dir(key)` return the local path to your scripts.
 
+
+## Groups
+
+conpype supports defining groups for your jobs. Citing from [the concourse documentation](https://concourse-ci.org/pipelines.html#schema.pipeline.groups):
+
+> Groups have no functional effect on your pipeline. They are purely for making it easier to grok large pipelines in the web UI.
+>
+> Note: once you have added groups to your pipeline, all jobs must be in a group.
+
+```python
+with Pipeline("test") as pipeline:
+    with pipeline.job("job1", groups=["my-group"]) as job:
+        @job.task()
+        def task1():
+            pass
+
+    with pipeline.job("job2", groups=["my-other-group"]) as job:
+        @job.task()
+        def task2():
+            pass
+```
+
+
 ## Local execution
 
 It's possible to execute each task locally

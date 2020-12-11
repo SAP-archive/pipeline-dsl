@@ -93,8 +93,10 @@ class Pipeline:
         else:
             raise Exception("Job " + job + " not found. List of available jobs: " + " ".join(list(self.jobs_by_name.keys())))
 
-    def job(self, name, serial=False, serial_groups=[], old_name=None):
-        result = Job(name, self.script, self.init_dirs, self.image_resource, self.resource_chains, self.__create_secret_manager(), serial=serial, serial_groups=serial_groups, old_name=old_name)
+    def job(self, name, serial=False, serial_groups=[], old_name=None, groups=[]):
+        result = Job(
+            name, self.script, self.init_dirs, self.image_resource, self.resource_chains, self.__create_secret_manager(), serial=serial, serial_groups=serial_groups, old_name=old_name, groups=groups
+        )
         self.jobs.append(result)
         self.jobs_by_name[name] = result
         return result
@@ -104,6 +106,14 @@ class Pipeline:
         self.resource_types[resource.__class__.__name__] = resource
 
     def concourse(self):
+        groups = {}
+        for job in self.jobs:
+            for group_name in job.groups:
+                if group_name in groups:
+                    groups[group_name].append(job.name)
+                else:
+                    groups[group_name] = [job.name]
+
         return {
             "pipeline_metadata": {
                 "name": self.name,
@@ -112,6 +122,7 @@ class Pipeline:
             "resource_types": list(filter(lambda x: x, map(lambda kv: kv[1].resource_type(), self.resource_types.items()))),
             "resources": list(map(lambda kv: kv[1].resource.concourse(kv[0]), self.resource_chains.items())),
             "jobs": list(map(lambda x: x.concourse(), self.jobs)),
+            "groups": [{"name": name, "jobs": jobs} for name, jobs in groups.items()],
         }
 
     def main(self):
