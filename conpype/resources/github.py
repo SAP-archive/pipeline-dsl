@@ -1,4 +1,5 @@
 import os
+import re
 from conpype.concourse import concourse_context
 
 
@@ -27,7 +28,7 @@ class GithubRelease:
         self.github_api_url = github_api_url
         self.github_v4_api_url = github_v4_api_url
         if github_api_url and not github_v4_api_url:
-            self.github_v4_api_url = os.path.dirname(github_api_url) + "/graphql"
+            self.github_v4_api_url = re.sub(r"/v[0-9]/*", "/graphql", github_api_url)
         self.github_uploads_url = github_uploads_url
         self.tag_filter = tag_filter
         self.order_by = order_by
