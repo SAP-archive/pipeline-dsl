@@ -177,7 +177,7 @@ class TestGithubResource(unittest.TestCase):
                     "pre_release": True,
                     "release": False,
                     "github_api_url": "github_api_url/v3",
-                    "github_v4_api_url": "github_api_url",
+                    "github_v4_api_url": "github_api_url/graphql",
                     "github_uploads_url": "github_uploads_url",
                 },
             },
