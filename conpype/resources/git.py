@@ -18,9 +18,11 @@ class GitRepoResource:
     def directory(self):
         return self.path
 
+    # Always returns the newest tag for the current version
     def tag(self):
         return subprocess.check_output(["git", "describe", "--tags"], cwd=self.path, stderr=subprocess.DEVNULL).decode("utf-8").strip()
 
+    # Returns one tag for the current version
     def ref(self):
         if concourse_context():
             with open(os.path.join(self.path, ".git/ref")) as f:

@@ -68,6 +68,7 @@ After `get`ting the resource the following methods are available:
 | `name`        | the given name                                   | the given name                                                          |
 | `path`        | the location where concourse stored the resource | `~/workspace/<name>`                                                    |
 | `directory()` | the location where concourse stored the resource | `~/workspace/<name>`                                                    |
+| `tag()`       | result of `git describe --tags`                  | result of `git describe --tags`                                         |
 | `ref()`       | see upstream documentation                       | result of `git describe --tags` if successful else `git rev-parse HEAD` |
 | `short_ref()` | see upstream documentation                       | result of `git rev-parse --short HEAD`                                  |
 
