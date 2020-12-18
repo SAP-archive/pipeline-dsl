@@ -161,7 +161,7 @@ class TestPoolResource(unittest.TestCase):
 
 class TestGithubResource(unittest.TestCase):
     def test_basic(self):
-        resource = GithubRelease("owner", "repo", "access_token", pre_release=True, release=False, github_api_url="github_api_url", github_uploads_url="github_uploads_url")
+        resource = GithubRelease("owner", "repo", "access_token", pre_release=True, release=False, github_api_url="github_api_url/v3", github_uploads_url="github_uploads_url")
 
         obj = resource.concourse("test")
         self.assertDictEqual(
@@ -176,7 +176,8 @@ class TestGithubResource(unittest.TestCase):
                     "access_token": "access_token",
                     "pre_release": True,
                     "release": False,
-                    "github_api_url": "github_api_url",
+                    "github_api_url": "github_api_url/v3",
+                    "github_v4_api_url": "github_api_url",
                     "github_uploads_url": "github_uploads_url",
                 },
             },
