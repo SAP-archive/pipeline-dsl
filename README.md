@@ -1,6 +1,4 @@
-# conpype
-
-[Concourse](https://concourse-ci.org/) pipeline DSL
+# Pipeline DSL for [Concourse](https://concourse-ci.org/) 
 
 
 ## Features
@@ -14,7 +12,7 @@
 
 ```bash
 brew install gnu-tar
-pip install --upgrade git+https://github.tools.sap/cki/conpype.git@main
+pip install --upgrade git+https://github.com/sap/pipeline-dsl.git@main
 ```
 
 ## Example
