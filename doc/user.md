@@ -106,11 +106,11 @@ with pipeline.job("bump-cf4k8s-templates", serial=True) as job:
     job.put("my-repo", params={"repository": "publish/my-repo", "rebase": True})
 ```
 
-The exact params depend on the resource used. For a list of resources available in conpype, see [the reference guide](./reference.md#resources).
+The exact params depend on the resource used. For a list of resources available in the pipeline-dsl for Concourse, see [the reference guide](./reference.md#resources).
 
 ### Passed attribute on get steps
 
-conpype will automatically adds all prior jobs, using the same resource (`get` or `put`), to the `passed` argument of `get`-steps. If this is not intended, the passed argument has to be specified explicitly (e.g. `job.get("my-repo", passed=[])`).
+The pipeline-dsl for Concourse will automatically adds all prior jobs, using the same resource (`get` or `put`), to the `passed` argument of `get`-steps. If this is not intended, the passed argument has to be specified explicitly (e.g. `job.get("my-repo", passed=[])`).
 
 
 ### Using shell scripts
@@ -131,7 +131,7 @@ When running locally, `Pipeline.script_dir(key)` return the local path to your s
 
 ## Groups
 
-conpype supports defining groups for your jobs. Citing from [the concourse documentation](https://concourse-ci.org/pipelines.html#schema.pipeline.groups):
+The pipeline-dsl for Concourse supports defining groups for your jobs. Citing from [the concourse documentation](https://concourse-ci.org/pipelines.html#schema.pipeline.groups):
 
 > Groups have no functional effect on your pipeline. They are purely for making it easier to grok large pipelines in the web UI.
 >
