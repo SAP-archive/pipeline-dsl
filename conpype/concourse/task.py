@@ -12,7 +12,7 @@ PYTHON_DIR = "pythonpath"
 
 
 class Task:
-    def __init__(self, fun, jobname, timeout, privileged, image_resource, script, inputs, outputs, secrets, attempts, caches, name, secret_manager, env):
+    def __init__(self, fun, jobname, secret_manager, image_resource, script, inputs=[], timeout="5m", privileged=False, outputs=[], secrets={}, attempts=1, caches=[], name=None, env={}):
         if not name:
             name = fun.__name__.replace("_", "-")
         self.name = name
