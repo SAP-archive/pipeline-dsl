@@ -7,7 +7,7 @@ class TestJobSimple(unittest.TestCase):
     def test_basic(self):
         def test_task(out):
             return 0
-        task = Task(test_task, "jobname", "timeout", privileged=False, image_resource={}, script="", inputs=[], outputs=[], secrets={}, attempts=4, caches=[], name=None, secret_manager=None, env={})
+        task = Task(test_task, jobname="jobname", secret_manager=None, image_resource={}, script="")
 
         obj = task.concourse()
 
@@ -16,7 +16,7 @@ class TestJobSimple(unittest.TestCase):
     def test_output(self):
         def test_task(out):
             return 0
-        task = Task(test_task, "jobname", "timeout", privileged=False, image_resource={}, script="", inputs=[], outputs=["out"], secrets={}, attempts=4, caches=[], name=None, secret_manager=None, env={})
+        task = Task(test_task, jobname="jobname", secret_manager=None, image_resource={}, script="", outputs=["out"])
 
         obj = task.concourse()
 
