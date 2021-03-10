@@ -1,35 +1,24 @@
-from conpype import Pipeline, PutStep, GetStep, DoStep, GitRepo, Task
+from conpype import Task
 import unittest
 
 
 class TestJobSimple(unittest.TestCase):
 
     def test_basic(self):
-        with Pipeline("test", script_dirs={"fake": "fake_scripts"}) as pipeline:
-            job = pipeline.job("job")
+        def test_task(out):
+            return 0
+        task = Task(test_task, "jobname", "timeout", privileged=False, image_resource={}, script="", inputs=[], outputs=[], secrets={}, attempts=4, caches=[], name=None, secret_manager=None, env={})
 
-            with job as job:
-                @job.task()
-                def test_task():
-                    return 0
+        obj = task.concourse()
 
-            obj = job.concourse()
-
-            obj["plan"] = obj["plan"][1:]  # remove init task. it is checked test_pipeline.py
-            self.assertEqual(obj["plan"][0]["task"], "test-task")
+        self.assertEqual(obj["task"], "test-task")
 
     def test_output(self):
-        with Pipeline("test", script_dirs={"fake": "fake_scripts"}) as pipeline:
-            job = pipeline.job("job")
+        def test_task(out):
+            return 0
+        task = Task(test_task, "jobname", "timeout", privileged=False, image_resource={}, script="", inputs=[], outputs=["out"], secrets={}, attempts=4, caches=[], name=None, secret_manager=None, env={})
 
-            with job as job:
-                @job.task(outputs=["out"])
-                def test_task(out):
-                    return 0
+        obj = task.concourse()
 
-            obj = job.concourse()
-
-            self.assertEqual(obj["plan"][1]["task"], "test-task")
-            self.assertEqual(obj["plan"][1]["config"]["outputs"][1], {"name": "out"})
-
-    
+        self.assertEqual(obj["task"], "test-task")
+        self.assertEqual(obj["config"]["outputs"][1], {"name": "out"})
