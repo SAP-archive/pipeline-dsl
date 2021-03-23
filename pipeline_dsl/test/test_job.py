@@ -1,4 +1,4 @@
-from conpype import Pipeline, PutStep, GetStep, DoStep, GitRepo
+from pipeline_dsl import Pipeline, PutStep, GetStep, DoStep, GitRepo
 import unittest
 
 

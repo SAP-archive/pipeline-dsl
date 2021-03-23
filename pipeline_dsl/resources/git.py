@@ -1,5 +1,5 @@
 import os
-from conpype.concourse import concourse_context, subprocess
+from pipeline_dsl.concourse import concourse_context, subprocess
 
 
 class GitRepoResource:

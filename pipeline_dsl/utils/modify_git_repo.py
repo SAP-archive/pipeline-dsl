@@ -1,6 +1,6 @@
 import os
-from conpype.resources.git import GitRepoResource
-from conpype.shell import shell
+from pipeline_dsl.resources.git import GitRepoResource
+from pipeline_dsl.shell import shell
 from contextlib import contextmanager
 
 

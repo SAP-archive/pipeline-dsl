@@ -18,7 +18,7 @@ pip install --upgrade git+https://github.com/sap/pipeline-dsl.git@main
 ## Example
 
 ```python
-from conpype import Pipeline, GitRepo
+from pipeline_dsl import Pipeline, GitRepo
 
 with Pipeline("c21s") as pipeline:
     pipeline.resource("shalm", GitRepo("https://github.com/wonderix/shalm"))

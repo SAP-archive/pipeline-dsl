@@ -1,4 +1,4 @@
-from conpype import Pipeline, GitRepo
+from pipeline_dsl import Pipeline, GitRepo
 
 with Pipeline("kubernetes") as pipeline:
     pipeline.resource("kubernetes", GitRepo("https://github.com/kubernetes/kubernetes"))

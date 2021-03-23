@@ -1,4 +1,4 @@
-from conpype import Task
+from pipeline_dsl import Task
 import unittest
 
 

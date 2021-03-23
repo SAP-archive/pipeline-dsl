@@ -1,6 +1,6 @@
 import os
 import re
-from conpype.concourse import concourse_context
+from pipeline_dsl.concourse import concourse_context
 
 
 class GithubReleaseResource:
