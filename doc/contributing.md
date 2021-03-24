@@ -166,4 +166,3 @@ Run tests
 ---------
 
 Use `make test` to ensure that everything is working fine.
-
