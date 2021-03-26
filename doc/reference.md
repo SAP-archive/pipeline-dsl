@@ -1,6 +1,6 @@
 # Reference
 
-This document is a reference of all provided classes
+This document is a reference of all provided classes.
 
 ## Resources
 
@@ -138,7 +138,7 @@ Example:
 
 Upstream resource documentation: https://github.com/concourse/registry-image-resource/blob/master/README.md
 
-Note: Only `repo`, `user`, `password`, `tag` and `variant` are currently supported in source configuration
+Note: Only `repo`, `user`, `password`, `tag` and `variant` are currently supported in source configuration.
 
 Example:
 ```python
@@ -152,7 +152,6 @@ Upstream resource documentation: https://github.com/telia-oss/github-pr-resource
 Example:
 ```python
 GithubPR(repository="torvalds/linux", access_token="((GITHUB_TOKEN))")
-")
 ```
 
 After `get`ting the resource the following methods are available:

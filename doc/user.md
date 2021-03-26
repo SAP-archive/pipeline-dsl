@@ -43,16 +43,16 @@ You can use values provided by the concourse secret manager as input variable to
 ```python
 @job.task(secrets={ "my_secret_arg": "MY_SECRET_IN_SECRET_STORE" })
 def hello(my_secret_arg):
-    print(f"Secret is {my_secret_arg}") 
+    print(f"Secret is {my_secret_arg}")
 ```
 
-The secret with the specified name (in this case `MY_SECRET_IN_SECRET_STORE`) will be available as an environment variable with the same name and will be passed to the function as the parameter with the specified name (in this case `my_secret_arg`). 
+The secret with the specified name (in this case `MY_SECRET_IN_SECRET_STORE`) will be available as an environment variable with the same name and will be passed to the function as the parameter with the specified name (in this case `my_secret_arg`).
 
-In a local environment the secret values are taken from environment variables or read from the secret-manager (see command line arguments)
+In a local environment the secret values are taken from environment variables or read from the secret-manager (see command line arguments).
 
 
 ## Resources
-To specify resources used in a pipeline, you'll have to specify them in the according pipeline's block. A complete working example can be found [here](../examples/resource.py)
+To specify resources used in a pipeline, you'll have to specify them in the according pipeline's block. A complete working example can be found [here](../examples/resource.py).
 
 ```python
 with Pipeline("kubernetes") as pipeline:
@@ -62,9 +62,10 @@ with Pipeline("kubernetes") as pipeline:
 ### Use a resource within a task
 
 To get access to a repository, you need to do the following
+
 * declare the repository as pipeline resource
 * use `resource = job.get` to clone it into you workspace
-* use `resource.path` to get the location of the repository inside you workspace
+* use `resource.path` to get the location of the repository inside your workspace
 
 
 ```python
@@ -102,7 +103,7 @@ with pipeline.job("bump-cf4k8s-templates", serial=True) as job:
     @job.task(outputs=["publish"], timeout="45m")
     def do_sth_with_repo(publish):
         shutil.copytree(source.path,publish)
-    
+
     job.put("my-repo", params={"repository": "publish/my-repo", "rebase": True})
 ```
 
@@ -110,7 +111,7 @@ The exact params depend on the resource used. For a list of resources available 
 
 ### Passed attribute on get steps
 
-The pipeline-dsl for Concourse will automatically adds all prior jobs, using the same resource (`get` or `put`), to the `passed` argument of `get`-steps. If this is not intended, the passed argument has to be specified explicitly (e.g. `job.get("my-repo", passed=[])`).
+The pipeline-dsl for Concourse will automatically add all prior jobs, using the same resource (`get` or `put`), to the `passed` argument of `get`-steps. If this is not intended, the passed argument has to be specified explicitly (e.g. `job.get("my-repo", passed=[])`).
 
 
 ### Using shell scripts
@@ -122,11 +123,11 @@ with Pipeline("test",script_dirs={"myscripts":"../bin"}) as pipeline:
     with pipeline.job("job") as job:
         @job.task()
         def task():
-            script_dir = pipeline.script_dri("myscripts")
+            script_dir = pipeline.script_dir("myscripts")
             shell([os.path.join(script_dir),"task.sh"])
 ```
 
-When running locally, `Pipeline.script_dir(key)` return the local path to your scripts.
+When running locally, `Pipeline.script_dir(key)` returns the local path to your scripts.
 
 
 ## Groups
@@ -159,7 +160,8 @@ It's possible to execute each task locally
 python <pipeline> --job <job> --task <task>
 ```
 
-In this case 
+In this case
+
 * all repositories are expected to be located in `$HOME/workspace/<basename of github repo>`
 * all secrets are either set as environment variable or the flag `--secret-manager vault` is passed as argument. In the second case you need to run `vault login` before starting the task locally.
 * no get actions on resources are executed
@@ -170,7 +172,8 @@ In this case
 
 ### Using libraries
 
-You can use `pipeline.path_append(dir)` to package a library within your pipeline. This command 
+You can use `pipeline.path_append(dir)` to package a library within your pipeline. This command
+
 * includes all `*.py` files from the specified directory to the pipeline
 * sets the system path `sys.path.append(dir)` in a way that this path will be searched automatically.
 
@@ -220,5 +223,4 @@ You can also package the code you would like to reuse into you cicd-image (e.g. 
 
 ## Calling other tasks
 
-This feature is currently not available
-
+This feature is currently not available.
