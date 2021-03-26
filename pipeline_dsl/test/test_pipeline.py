@@ -1,11 +1,11 @@
 import unittest
 
-from conpype import Pipeline, InitTask
+from pipeline_dsl import Pipeline, InitTask
 import base64
 import os
 import subprocess
-from conpype.utils.docker_daemon import START_SCRIPT, STOP_SCRIPT
-from conpype.concourse.__shared import set_concourse_context
+from pipeline_dsl.utils.docker_daemon import START_SCRIPT, STOP_SCRIPT
+from pipeline_dsl.concourse.__shared import set_concourse_context
 from contextlib import contextmanager
 
 
@@ -40,7 +40,7 @@ class TestPipeline(unittest.TestCase):
                 init_task.init_dirs,
                 {
                     "starter": TEST_DIR,
-                    "pythonpath/conpype": os.path.dirname(TEST_DIR),
+                    "pythonpath/pipeline_dsl": os.path.dirname(TEST_DIR),
                     "fake": os.path.join(TEST_DIR, "fake_scripts"),
                 },
             )
@@ -96,4 +96,4 @@ class TestPipeline(unittest.TestCase):
 if __name__ == "__main__":
     unittest.main()
 
-# run > python -munittest in main conpype dir to execute
+# run > python -munittest in main pipeline-dsl dir to execute

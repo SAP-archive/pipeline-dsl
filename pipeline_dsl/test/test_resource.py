@@ -1,7 +1,7 @@
 import unittest
 import os
-from conpype.resources import GitRepo, Cron, DockerImage, GoogleCloudStorage, Pool, GithubRelease, SemVer, SemVerGitDriver, RegistryImage, GithubPR
-from conpype.concourse.__shared import concourse_ctx
+from pipeline_dsl.resources import GitRepo, Cron, DockerImage, GoogleCloudStorage, Pool, GithubRelease, SemVer, SemVerGitDriver, RegistryImage, GithubPR
+from pipeline_dsl.concourse.__shared import concourse_ctx
 
 
 class TestGitResource(unittest.TestCase):
@@ -307,4 +307,4 @@ class TestGithubPRResource(unittest.TestCase):
 if __name__ == "__main__":
     unittest.main()
 
-# run > python -munittest in main conpype dir to execute
+# run > python -munittest in main pipeline-dsl dir to execute

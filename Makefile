@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 
-build: conpype/*.py
+build: pipeline_dsl/*.py
 	python setup.py build
 
 install: build
