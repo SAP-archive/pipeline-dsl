@@ -18,15 +18,15 @@ DEFAULT_IMAGE = {
 }
 
 with Pipeline("pipeline-dsl", team="garden", image_resource=DEFAULT_IMAGE) as pipeline:
-    repo_url = "https://github.com/SAP/pipeline-dsl"
+    repo_url = "git@github.com:SAP/pipeline-dsl.git"
     pipeline.resource(
         "pipeline-dsl",
-        GitRepo(repo_url, username="akhinos", password="((GITHUB_TOKEN))", ignore_paths=["concourse/*", "doc/*"], branch="main"),
+        GitRepo(repo_url, private_key="((GITHUB_COM_DEPLOY_KEY))", ignore_paths=["concourse/*", "doc/*"], branch="main"),
     )
 
     pipeline.resource(
         "pipeline-dsl-stable",
-        GitRepo(repo_url, username="akhinos", password="((GITHUB_TOKEN))", ignore_paths=["concourse/*"], branch="stable"),
+        GitRepo(repo_url, private_key="((GITHUB_COM_DEPLOY_KEY))", ignore_paths=["concourse/*"], branch="stable"),
     )
 
     with pipeline.job("test") as job:
