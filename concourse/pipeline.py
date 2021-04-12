@@ -1,4 +1,4 @@
-from conpype import Pipeline, GitRepo, shell
+from pipeline_dsl import Pipeline, GitRepo, shell
 import urllib.request
 import os
 import stat
@@ -17,34 +17,35 @@ DEFAULT_IMAGE = {
     },
 }
 
-with Pipeline("conpype", team="garden", image_resource=DEFAULT_IMAGE) as pipeline:
+with Pipeline("pipeline-dsl", team="garden", image_resource=DEFAULT_IMAGE) as pipeline:
+    repo_url = "git@github.com:SAP/pipeline-dsl.git"
     pipeline.resource(
-        "conpype",
-        GitRepo("https://github.tools.sap/cki/conpype", username="istio-serviceuser", password="((GITHUB_TOOLS_SAP_TOKEN))", ignore_paths=["concourse/*", "doc/*"], branch="develop"),
+        "pipeline-dsl",
+        GitRepo(repo_url, private_key="((GITHUB_COM_DEPLOY_KEY))", ignore_paths=["concourse/*", "doc/*"], branch="main"),
     )
 
     pipeline.resource(
-        "conpype-main",
-        GitRepo("https://github.tools.sap/cki/conpype", username="istio-serviceuser", password="((GITHUB_TOOLS_SAP_TOKEN))", ignore_paths=["concourse/*"], branch="main"),
+        "pipeline-dsl-stable",
+        GitRepo(repo_url, private_key="((GITHUB_COM_DEPLOY_KEY))", ignore_paths=["concourse/*"], branch="stable"),
     )
 
     with pipeline.job("test") as job:
-        job.get("conpype", trigger=True)
+        job.get("pipeline-dsl", trigger=True)
 
         @job.task()
         def install_and_test():
-            shell(["make", "install"], cwd="conpype")
+            shell(["make", "install"], cwd="pipeline-dsl")
             urllib.request.urlretrieve("https://cki-concourse.istio.sapcloud.io/api/v1/cli?arch=amd64&platform=linux", "/usr/bin/fly")
             os.chmod("/usr/bin/fly", stat.S_IEXEC | stat.S_IREAD)
-            shell(["make", "test"], cwd="conpype")
+            shell(["make", "test"], cwd="pipeline-dsl")
 
     with pipeline.job("coverage") as job:
-        job.get("conpype", trigger=True)
+        job.get("pipeline-dsl", trigger=True)
 
         @job.task()
         def ensure_coverage():
-            shell(["make", "coverage"], cwd="conpype")
-            repjson = subprocess.check_output(["coverage", "json", "-o", "-"], cwd="conpype")
+            shell(["make", "coverage"], cwd="pipeline-dsl")
+            repjson = subprocess.check_output(["coverage", "json", "-o", "-"], cwd="pipeline-dsl")
             report = json.loads(repjson)
             percentage = report["totals"]["percent_covered"]
 
@@ -54,4 +55,4 @@ with Pipeline("conpype", team="garden", image_resource=DEFAULT_IMAGE) as pipelin
                 sys.exit(1)
             print(f"Coverage over {COVERAGE_THRESHOLD}%! Coverage check passed.")
 
-        job.put("conpype-main", params={"repository": "conpype"})
+        job.put("pipeline-dsl-stable", params={"repository": "pipeline-dsl"})
