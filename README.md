@@ -12,7 +12,7 @@
 
 ```bash
 brew install gnu-tar
-pip install --upgrade git+https://github.com/sap/pipeline-dsl.git@main
+pip3 install --upgrade git+https://github.com/sap/pipeline-dsl.git@main
 ```
 
 ## Example

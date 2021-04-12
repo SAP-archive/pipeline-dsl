@@ -157,7 +157,7 @@ with Pipeline("test") as pipeline:
 It's possible to execute each task locally
 
 ```
-python <pipeline> --job <job> --task <task>
+python3 <pipeline> --job <job> --task <task>
 ```
 
 In this case

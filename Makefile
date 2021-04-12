@@ -1,10 +1,10 @@
 SHELL := /bin/bash
 
 build: pipeline_dsl/*.py
-	python setup.py build
+	python3 setup.py build
 
 install: build
-	python setup.py install
+	python3 setup.py install
 
 test: test-examples test-unit
 
@@ -12,11 +12,11 @@ test-examples:
 	@set -euo pipefail; \
 	for i in examples/*.py; do \
 		echo $$i; \
-		fly vp -c <(PYTHONPATH=$$(pwd) python $$i --dump); \
+		fly vp -c <(PYTHONPATH=$$(pwd) python3 $$i --dump); \
 	done
 	
 test-unit:
-	PYTHONPATH=$$(pwd) python -m"unittest"
+	PYTHONPATH=$$(pwd) python3 -m"unittest"
 
 coverage:
 	PYTHONPATH=$$(pwd) coverage run -m unittest
