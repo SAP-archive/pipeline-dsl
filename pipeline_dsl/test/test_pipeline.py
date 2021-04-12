@@ -96,4 +96,4 @@ class TestPipeline(unittest.TestCase):
 if __name__ == "__main__":
     unittest.main()
 
-# run > python -munittest in main pipeline-dsl dir to execute
+# run > python3 -munittest in main pipeline-dsl dir to execute
