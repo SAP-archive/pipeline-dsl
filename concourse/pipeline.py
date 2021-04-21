@@ -17,16 +17,16 @@ DEFAULT_IMAGE = {
     },
 }
 
-with Pipeline("pipeline-dsl", team="garden", image_resource=DEFAULT_IMAGE) as pipeline:
+with Pipeline("pipeline-dsl-test", team="garden", image_resource=DEFAULT_IMAGE) as pipeline:
     repo_url = "git@github.com:SAP/pipeline-dsl.git"
     pipeline.resource(
         "pipeline-dsl",
-        GitRepo(repo_url, private_key="((GITHUB_COM_DEPLOY_KEY))", ignore_paths=["concourse/*", "doc/*"], branch="main"),
+        GitRepo(repo_url, private_key="((GITHUB_COM_DEPLOY_KEY))", ignore_paths=["concourse/*", "doc/*"], branch="add-publish-step"),
     )
 
     pipeline.resource(
         "pipeline-dsl-stable",
-        GitRepo(repo_url, private_key="((GITHUB_COM_DEPLOY_KEY))", ignore_paths=["concourse/*"], branch="stable"),
+        GitRepo(repo_url, private_key="((GITHUB_COM_DEPLOY_KEY))", ignore_paths=["concourse/*"], branch="publish-stable"),
     )
 
     with pipeline.job("test") as job:
@@ -56,3 +56,4 @@ with Pipeline("pipeline-dsl", team="garden", image_resource=DEFAULT_IMAGE) as pi
             print(f"Coverage over {COVERAGE_THRESHOLD}%! Coverage check passed.")
 
         job.put("pipeline-dsl-stable", params={"repository": "pipeline-dsl"})
+
