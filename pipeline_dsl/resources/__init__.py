@@ -7,6 +7,7 @@ from pipeline_dsl.resources.semver import SemVer, SemVerGitDriver
 from pipeline_dsl.resources.cron import Cron
 from pipeline_dsl.resources.registry_image import RegistryImage
 from pipeline_dsl.resources.github_pr import GithubPR
+from pipeline_dsl.resources.pypi import PyPi
 
 ConcourseLockResource = Pool
 GoogleCloudStorageResource = GoogleCloudStorage

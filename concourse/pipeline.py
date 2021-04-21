@@ -1,4 +1,4 @@
-from pipeline_dsl import Pipeline, GitRepo, shell, SemVer, SemVerGitDriver
+from pipeline_dsl import Pipeline, GitRepo, shell, SemVer, SemVerGitDriver, PyPi
 import urllib.request
 import os
 import stat
@@ -32,6 +32,11 @@ with Pipeline("pipeline-dsl-test", team="garden", image_resource=DEFAULT_IMAGE) 
     pipeline.resource(
         "version",
         SemVer(source=SemVerGitDriver(repo_url, private_key="((GITHUB_COM_DEPLOY_KEY))", branch="version", file="version"), initial_version="0.1.0")
+    )
+
+    pipeline.resource(
+        "pypi",
+        PyPi(name="pipeline-dsl")
     )
 
     with pipeline.job("test") as job:
@@ -75,16 +80,19 @@ with Pipeline("pipeline-dsl-test", team="garden", image_resource=DEFAULT_IMAGE) 
         job.put("version", params={"file": "version/version"})
 
     with pipeline.job("rc") as job:
-        with job.in_parallel() as resources:
-            resources.get("pipeline-dsl", trigger=True, passed=["coverage"])
-            resources.get("version", params={"pre": "rc"}, passed=[])
+        with job.in_parallel() as inputs:
+            inputs.get("pipeline-dsl", trigger=True, passed=["coverage"])
+            inputs.get("version", params={"pre": "rc"}, passed=[])
 
         job.put("version", params={"file": "version/version"})
 
     with pipeline.job("release") as job:
-        with job.in_parallel() as resources:
-            version = resources.get("version", params={"bump": "final"}, passed=["rc"])
-            resources.get("pipeline-dsl", passed=["rc"])
+        with job.in_parallel() as inputs:
+            version = inputs.get("version", params={"bump": "final"}, passed=["rc"])
+            inputs.get("pipeline-dsl", passed=["rc"])
 
-        job.put("pipeline-dsl", params={"repository": "pipeline-dsl", "tag": "version/version", "tag_prefix": "v", "only_tag": "true"})
-        job.put("version", params={"file": "version/version"})
+        job.put("pypi")
+
+        with job.in_parallel() as outputs:
+          outputs.put("pipeline-dsl", params={"repository": "pipeline-dsl", "tag": "version/version", "tag_prefix": "v", "only_tag": "true"})
+          outputs.put("version", params={"file": "version/version"})
