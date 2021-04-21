@@ -18,6 +18,9 @@ test-examples:
 test-unit:
 	PYTHONPATH=$$(pwd) python3 -m"unittest"
 
+dist:
+	python3 setup.py sdist
+
 coverage:
 	PYTHONPATH=$$(pwd) coverage run -m unittest
 	coverage html
