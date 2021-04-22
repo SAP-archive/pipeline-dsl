@@ -1,9 +1,8 @@
 import os
 import json
-import subprocess
-import platform
 import base64
-import glob
+import tarfile
+import io
 
 from .__shared import CACHE_DIR, SCRIPT_DIR, concourse_context
 
@@ -95,16 +94,25 @@ class InitTask:
         self.image_resource = image_resource
 
     def package(self):
-        tar = "gtar" if platform.system() == "Darwin" else "tar"
-        files = []
-        transform = []
+        buffer = io.BytesIO()
+        tar = tarfile.open(fileobj=buffer, mode="x:bz2")
         init_dirs = sorted(list(self.init_dirs.items()), key=lambda d: len(d[1]), reverse=True)
+
+        def filter(tarinfo):
+            if not (tarinfo.isdir() or tarinfo.name.endswith(".sh") or tarinfo.name.endswith(".py")):
+                return None
+            tarinfo.uid = 0
+            tarinfo.gid = 0
+            tarinfo.uname = "root"
+            tarinfo.gname = "root"
+            tarinfo.mtime = 0
+            return tarinfo
+
         for dir_concourse, dir_local in init_dirs:
             dir_local = os.path.abspath(dir_local)
-            transform.append(f"--transform 's|{dir_local}|{dir_concourse}|g'")
-            files = files + list(glob.glob(os.path.join(dir_local, "**", "*.[ps][yh]"), recursive=True))
-        cmd = f'{tar} cj --sort=name --mtime="UTC 2019-01-01" {" ".join(transform)} --owner=root:0 --group=root:0 -b 1 -P -f - {" ".join(files)}'
-        return base64.b64encode(subprocess.check_output(cmd, shell=True)).decode("utf-8")
+            tar.add(dir_local, arcname=dir_concourse, filter=filter)
+        tar.close()
+        return base64.b64encode(buffer.getvalue()).decode("utf-8")
 
     def concourse(self):
         return {

@@ -11,7 +11,6 @@
 ## Installation
 
 ```bash
-brew install gnu-tar
 pip3 install --upgrade git+https://github.com/sap/pipeline-dsl.git@main
 ```
 
