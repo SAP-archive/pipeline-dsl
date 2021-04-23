@@ -14,6 +14,12 @@
 
 ## Installation
 
+Installation from [PyPI](https://pypi.org/project/pipeline-dsl/)
+```bash
+pip3 install pipeline-dsl
+```
+
+Installation from GitHub
 ```bash
 pip3 install --upgrade git+https://github.com/sap/pipeline-dsl.git@main
 ```
