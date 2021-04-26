@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="pipeline-dsl",
-    version="0.3.0-dev",
+    version="0.3.0",
     author="SAP SE",
     author_email="istio@sap.com",
     description="A Python Pipeline DSL for Concourse",
