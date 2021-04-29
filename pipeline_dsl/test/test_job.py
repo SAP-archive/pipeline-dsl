@@ -196,3 +196,50 @@ class TestJobSimple(unittest.TestCase):
                     },
                 },
             )
+
+    def test_task(self):
+        with Pipeline("test", script_dirs={"fake": "fake_scripts"}) as pipeline:
+            pipeline.resource("res-1", GitRepo("https://example.com/repo.git"))
+            pipeline.resource("res-2", GitRepo("https://example.com/repo.git"))
+
+            job = pipeline.job("job")
+
+            @job.task(outputs=["test"])
+            def task_output(test):
+                pass
+
+            @job.task(inputs=["test"])
+            def task_input():
+                pass
+
+            obj = job.concourse()
+
+            obj["plan"] = obj["plan"][1:]  # remove init task. it is checked test_pipeline.py
+            self.assertListEqual(
+                obj["plan"][0]["config"]["inputs"],
+                [
+                    {"name": "tasks"},
+                    {"name": "scripts"},
+                ],
+            )
+            self.assertListEqual(
+                obj["plan"][0]["config"]["outputs"],
+                [
+                    {"name": "tasks"},
+                    {"name": "test"},
+                ],
+            )
+            self.assertListEqual(
+                obj["plan"][1]["config"]["inputs"],
+                [
+                    {"name": "tasks"},
+                    {"name": "scripts"},
+                    {"name": ["test"]},
+                ],
+            )
+            self.assertListEqual(
+                obj["plan"][1]["config"]["outputs"],
+                [
+                    {"name": "tasks"},
+                ],
+            )

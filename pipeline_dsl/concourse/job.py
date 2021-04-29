@@ -51,11 +51,13 @@ class Job:
         self.inputs.append(name)
         return resource_chain.resource.get(name)
 
-    def task(self, image_resource=None, **kwargs):
+    def task(self, image_resource=None, inputs=None, **kwargs):
         if not image_resource:
             image_resource = self.image_resource
 
         def decorate(fun):
+            if inputs:
+                self.inputs.append(inputs)
             task = Task(fun=fun, jobname=self.name, secret_manager=self.secret_manager, image_resource=image_resource, script=self.script, inputs=self.inputs, **kwargs)
 
             self.plan.append(task)
