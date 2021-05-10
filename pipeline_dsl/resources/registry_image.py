@@ -1,5 +1,6 @@
 import os
 from pipeline_dsl.concourse import concourse_context
+from pipeline_dsl.resources.resource import AbstractResource
 
 
 class RegistryImageResource:
@@ -17,18 +18,18 @@ class RegistryImageResource:
         return default
 
 
-class RegistryImage:
-    def __init__(self, repo, username=None, password=None, tag=None, variant=None):
+class RegistryImage(AbstractResource):
+    def __init__(self, repo: str, username: str = None, password: str = None, tag: str = None, variant: str = None):
         self.repo = repo
         self.username = username
         self.password = password
         self.tag = tag
         self.variant = variant
 
-    def resource_type(self):
+    def resource_type(self) -> dict:
         return None
 
-    def concourse(self, name):
+    def concourse(self, name: str) -> dict:
         result = {
             "name": name,
             "type": "registry-image",
@@ -45,5 +46,5 @@ class RegistryImage:
         )
         return result
 
-    def get(self, name):
+    def get(self, name: str):
         return RegistryImageResource(name)
