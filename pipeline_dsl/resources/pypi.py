@@ -1,10 +1,14 @@
-class PyPi:
-    def __init__(self, name, username, password):
+from typing import Optional, Dict, Collection
+from pipeline_dsl.resources.resource import AbstractResource
+
+
+class PyPi(AbstractResource):
+    def __init__(self, name: str, username: str, password: str):
         self.name = name
         self.username = username
         self.password = password
 
-    def resource_type(self):
+    def resource_type(self) -> Optional[Dict]:
         return {
             "name": "pypi",
             "type": "docker-image",
@@ -14,10 +18,10 @@ class PyPi:
             },
         }
 
-    def get(self, name):
+    def get(self, name: str) -> 'PyPi':
         return self
 
-    def concourse(self, name):
+    def concourse(self, name) -> Dict[str, Collection[str]]:
         result = {
             "name": name,
             "type": "pypi",

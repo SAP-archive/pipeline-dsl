@@ -1,17 +1,18 @@
-import os
-from pipeline_dsl.concourse import concourse_context
 from pipeline_dsl.resources.resource import AbstractResource
+from pipeline_dsl.concourse import concourse_context
+from typing import Dict, Optional, Collection, Union
+import os
 
 
 class RegistryImageResource:
-    def __init__(self, name):
+    def __init__(self, name: str):
         self.name = name
         self.path = os.path.abspath(self.name)
 
     def __str__(self):
         return self.name
 
-    def tag(self, default=None):
+    def tag(self, default: Optional[str] = None) -> Optional[str]:
         if concourse_context():
             with open(os.path.join(self.path, "tag")) as f:
                 return f.read().strip()
@@ -26,10 +27,10 @@ class RegistryImage(AbstractResource[RegistryImageResource]):
         self.tag = tag
         self.variant = variant
 
-    def resource_type(self) -> dict:
+    def resource_type(self) -> Optional[Dict]:
         return None
 
-    def concourse(self, name: str) -> dict:
+    def concourse(self, name: str) -> Dict[str, Collection[str]]:
         result = {
             "name": name,
             "type": "registry-image",

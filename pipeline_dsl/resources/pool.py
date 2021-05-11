@@ -1,12 +1,16 @@
-class Pool:
-    def __init__(self, uri, branch, pool, username, password):
+from typing import Optional, Dict, Collection
+from pipeline_dsl.resources.resource import AbstractResource
+
+
+class Pool(AbstractResource):
+    def __init__(self, uri: str, branch: str, pool: str, username: str, password: str):
         self.uri = uri
         self.branch = branch
         self.pool = pool
         self.username = username
         self.password = password
 
-    def resource_type(self):
+    def resource_type(self) -> Optional[Dict]:
         return {
             "name": "pool-stable",
             "type": "docker-image",
@@ -16,10 +20,10 @@ class Pool:
             },
         }
 
-    def get(self, name):
+    def get(self, name: str) -> 'Pool':
         return self
 
-    def concourse(self, name):
+    def concourse(self, name: str) -> Dict[str, Collection[str]]:
         result = {
             "name": name,
             "type": "pool-stable",
