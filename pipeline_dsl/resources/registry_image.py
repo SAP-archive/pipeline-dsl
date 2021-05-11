@@ -18,7 +18,7 @@ class RegistryImageResource:
         return default
 
 
-class RegistryImage(AbstractResource):
+class RegistryImage(AbstractResource[RegistryImageResource]):
     def __init__(self, repo: str, username: str = None, password: str = None, tag: str = None, variant: str = None):
         self.repo = repo
         self.username = username
@@ -46,5 +46,5 @@ class RegistryImage(AbstractResource):
         )
         return result
 
-    def get(self, name: str):
+    def get(self, name: str) -> RegistryImageResource:
         return RegistryImageResource(name)

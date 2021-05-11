@@ -1,7 +1,10 @@
-from abc import ABC, abstractmethod
+from abc import abstractmethod
+from typing import TypeVar, Generic
 
 
-class AbstractResource(ABC):
+T = TypeVar('T')
+
+class AbstractResource(Generic[T]):
     @abstractmethod
     def resource_type(self) -> dict:
         pass
@@ -11,5 +14,5 @@ class AbstractResource(ABC):
         pass
 
     @abstractmethod
-    def get(self, name: str):
+    def get(self, name: str) -> T:
         pass
