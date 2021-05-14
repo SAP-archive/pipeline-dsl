@@ -1,7 +1,7 @@
 # Pipeline DSL for [Concourse](https://concourse-ci.org/) 
 
 [![downloads](https://static.pepy.tech/badge/pipeline-dsl/month)](https://pypi.org/project/pipeline-dsl/)
-[![python](https://img.shields.io/badge/python-3.6-blue.svg)](https://pypi.org/project/pipeline-dsl/)
+[![python](https://img.shields.io/badge/python-3.7-blue.svg)](https://pypi.org/project/pipeline-dsl/)
 [![pypi](https://img.shields.io/pypi/v/pipeline-dsl.svg)](https://pypi.org/project/pipeline-dsl/)
 [![license](https://img.shields.io/pypi/l/pipeline-dsl.svg)](https://pypi.org/project/pipeline-dsl/)
 
