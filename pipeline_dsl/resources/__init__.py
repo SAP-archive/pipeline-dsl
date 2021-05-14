@@ -8,6 +8,7 @@ from pipeline_dsl.resources.cron import Cron
 from pipeline_dsl.resources.registry_image import RegistryImage
 from pipeline_dsl.resources.github_pr import GithubPR
 from pipeline_dsl.resources.pypi import PyPi
+from pipeline_dsl.resources.resource import ConcourseResource
 
 ConcourseLockResource = Pool
 GoogleCloudStorageResource = GoogleCloudStorage

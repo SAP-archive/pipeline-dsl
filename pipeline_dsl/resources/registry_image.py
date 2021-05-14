@@ -1,4 +1,4 @@
-from pipeline_dsl.resources.resource import AbstractResource
+from pipeline_dsl.resources.resource import AbstractResource, ConcourseResource
 from pipeline_dsl.concourse import concourse_context
 from typing import Dict, Optional, Collection, Union
 import os
@@ -30,20 +30,21 @@ class RegistryImage(AbstractResource[RegistryImageResource]):
     def resource_type(self) -> Optional[Dict]:
         return None
 
-    def concourse(self, name: str) -> Dict[str, Collection[str]]:
-        result = {
-            "name": name,
-            "type": "registry-image",
-            "source": {
+    def concourse(self, name: str) -> ConcourseResource:
+        result = ConcourseResource(
+            name=name,
+            type="registry-image",
+            icon="docker",
+            source={
                 "repository": self.repo,
                 "username": self.username,
                 "password": self.password,
                 "tag": self.tag,
                 "variant": self.variant,
             },
-        }
-        result["source"] = dict(
-            filter(lambda x: x[1] is not None, result["source"].items()),
+        )
+        result.source = dict(
+            filter(lambda x: x[1] is not None, result.source.items()),
         )
         return result
 

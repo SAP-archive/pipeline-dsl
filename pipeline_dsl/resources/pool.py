@@ -1,5 +1,5 @@
 from typing import Optional, Dict, Collection
-from pipeline_dsl.resources.resource import AbstractResource
+from pipeline_dsl.resources.resource import AbstractResource, ConcourseResource
 
 
 class Pool(AbstractResource):
@@ -20,20 +20,20 @@ class Pool(AbstractResource):
             },
         }
 
-    def get(self, name: str) -> 'Pool':
+    def get(self, name: str) -> "Pool":
         return self
 
-    def concourse(self, name: str) -> Dict[str, Collection[str]]:
-        result = {
-            "name": name,
-            "type": "pool-stable",
-            "icon": "lock",
-            "source": {
+    def concourse(self, name: str) -> ConcourseResource:
+        result = ConcourseResource(
+            name=name,
+            type="pool-stable",
+            icon="lock",
+            source={
                 "uri": self.uri,
                 "branch": self.branch,
                 "pool": self.pool,
                 "username": self.username,
                 "password": self.password,
             },
-        }
+        )
         return result
