@@ -1,8 +1,11 @@
 from pipeline_dsl import Pipeline, PutStep, GetStep, DoStep, GitRepo
 import unittest
-
+import sys
 
 class TestJobSimple(unittest.TestCase):
+    def setUp(self):
+        sys.argv = ["pipeline.py"]
+
     def test_basic(self):
         with Pipeline("test", script_dirs={"fake": "fake_scripts"}) as pipeline:
             job = pipeline.job("job")
