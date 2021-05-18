@@ -47,22 +47,26 @@ with Pipeline("pipeline-dsl", team="garden", image_resource=DEFAULT_IMAGE) as pi
     )
 
     with pipeline.job("test") as job:
-        job.get("pipeline-dsl", trigger=True)
+        pipeline_dsl = job.get("pipeline-dsl", trigger=True)
 
         @job.task()
         def install_and_test():
-            shell(["make", "install"], cwd="pipeline-dsl")
+            cwd = pipeline_dsl.directory()
+            shell(["python3", "-m", "pip", "install", "-r", "requirements.txt"], cwd=cwd)
+            shell(["make", "install"], cwd=cwd)
             urllib.request.urlretrieve("https://cki-concourse.istio.sapcloud.io/api/v1/cli?arch=amd64&platform=linux", "/usr/bin/fly")
             os.chmod("/usr/bin/fly", stat.S_IEXEC | stat.S_IREAD)
-            shell(["make", "test"], cwd="pipeline-dsl")
+            shell(["make", "test"], cwd=cwd)
 
     with pipeline.job("coverage") as job:
-        job.get("pipeline-dsl", trigger=True)
+        pipeline_dsl = job.get("pipeline-dsl", trigger=True)
 
         @job.task()
         def ensure_coverage():
-            shell(["make", "coverage"], cwd="pipeline-dsl")
-            repjson = subprocess.check_output(["coverage", "json", "-o", "-"], cwd="pipeline-dsl")
+            cwd = pipeline_dsl.directory()
+            shell(["python3", "-m", "pip", "install", "-r", "requirements.txt"], cwd=cwd)
+            shell(["make", "coverage"], cwd=cwd)
+            repjson = subprocess.check_output(["coverage", "json", "-o", "-"], cwd=cwd)
             report = json.loads(repjson)
             percentage = report["totals"]["percent_covered"]
 
