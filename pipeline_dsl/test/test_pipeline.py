@@ -1,4 +1,5 @@
 import unittest
+from mock import patch
 
 from pipeline_dsl import Pipeline, InitTask
 import base64
@@ -22,9 +23,8 @@ def concourse_ctx():
 TEST_DIR = os.path.abspath(os.path.dirname(__file__))
 
 
+@patch.object(sys, 'argv', ["test"])
 class TestPipeline(unittest.TestCase):
-    def setUp(self):
-        sys.argv = ["pipeline.py"]
 
     def test_init_task(self):
         with Pipeline("test", script_dirs={"fake": "fake_scripts"}) as pipeline:
