@@ -23,9 +23,8 @@ def concourse_ctx():
 TEST_DIR = os.path.abspath(os.path.dirname(__file__))
 
 
-@patch.object(sys, 'argv', ["test"])
+@patch.object(sys, "argv", ["test"])
 class TestPipeline(unittest.TestCase):
-
     def test_init_task(self):
         with Pipeline("test", script_dirs={"fake": "fake_scripts"}) as pipeline:
             with pipeline.job("job") as job:
