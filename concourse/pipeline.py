@@ -8,7 +8,6 @@ import subprocess
 import json
 import sys
 
-COVERAGE_THRESHOLD = 75
 DEFAULT_IMAGE = {
     "type": "docker-image",
     "source": {
@@ -64,15 +63,6 @@ with Pipeline("pipeline-dsl", team="garden", image_resource=DEFAULT_IMAGE) as pi
             cwd = pipeline_dsl.directory()
             shell(["python3", "-m", "pip", "install", "-r", "requirements.txt"], cwd=cwd)
             shell(["make", "coverage"], cwd=cwd)
-            repjson = subprocess.check_output(["coverage", "json", "-o", "-"], cwd=cwd)
-            report = json.loads(repjson)
-            percentage = report["totals"]["percent_covered"]
-
-            print(f"Current coverage: {percentage}")
-            if float(percentage) < COVERAGE_THRESHOLD:
-                print(f"Coverage below {COVERAGE_THRESHOLD}%! Failing job.")
-                sys.exit(1)
-            print(f"Coverage over {COVERAGE_THRESHOLD}%! Coverage check passed.")
 
         job.put("pipeline-dsl-stable", params={"repository": "pipeline-dsl"})
 
