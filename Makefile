@@ -22,6 +22,6 @@ dist:
 	python3 setup.py sdist
 
 coverage:
-	PYTHONPATH=$$(pwd) coverage run -m unittest
+	PYTHONPATH=$$(pwd) coverage run --include=./* -m unittest 
 	coverage html
 	coverage report
