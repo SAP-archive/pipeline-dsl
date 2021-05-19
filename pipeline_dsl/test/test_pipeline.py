@@ -1,9 +1,11 @@
 import unittest
+from mock import patch
 
 from pipeline_dsl import Pipeline, InitTask
 import base64
 import os
 import subprocess
+import sys
 from pipeline_dsl.utils.docker_daemon import START_SCRIPT, STOP_SCRIPT
 from pipeline_dsl.concourse.__shared import set_concourse_context
 from contextlib import contextmanager
@@ -21,6 +23,7 @@ def concourse_ctx():
 TEST_DIR = os.path.abspath(os.path.dirname(__file__))
 
 
+@patch.object(sys, "argv", ["test"])
 class TestPipeline(unittest.TestCase):
     def test_init_task(self):
         with Pipeline("test", script_dirs={"fake": "fake_scripts"}) as pipeline:

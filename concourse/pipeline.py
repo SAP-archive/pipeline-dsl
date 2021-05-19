@@ -19,9 +19,10 @@ DEFAULT_IMAGE = {
     },
 }
 
+
 def update_version(new_version, source, target):
     with modify_git_repo(source, target, "Bump version " + new_version):
-      shell(["sed", "-i", 's/version=.*/version="'+new_version+'",/', 'setup.py'])
+        shell(["sed", "-i", 's/version=.*/version="' + new_version + '",/', "setup.py"])
 
 
 with Pipeline("pipeline-dsl", team="garden", image_resource=DEFAULT_IMAGE) as pipeline:
@@ -36,21 +37,16 @@ with Pipeline("pipeline-dsl", team="garden", image_resource=DEFAULT_IMAGE) as pi
         GitRepo(repo_url, private_key="((GITHUB_COM_DEPLOY_KEY))", ignore_paths=["concourse/*"], branch="stable"),
     )
 
-    pipeline.resource(
-        "version",
-        SemVer(source=SemVerGitDriver(repo_url, private_key="((GITHUB_COM_DEPLOY_KEY))", branch="version", file="version"), initial_version="0.1.0")
-    )
+    pipeline.resource("version", SemVer(source=SemVerGitDriver(repo_url, private_key="((GITHUB_COM_DEPLOY_KEY))", branch="version", file="version"), initial_version="0.1.0"))
 
-    pipeline.resource(
-        "pypi",
-        PyPi(name="pipeline-dsl", username="((PYPI_USER.username))", password="((PYPI_USER.password))")
-    )
+    pipeline.resource("pypi", PyPi(name="pipeline-dsl", username="((PYPI_USER.username))", password="((PYPI_USER.password))"))
 
     with pipeline.job("test") as job:
         job.get("pipeline-dsl", trigger=True)
 
         @job.task()
         def install_and_test():
+            shell(["python3", "-m", "pip", "install", "-r", "requirements.txt"], cwd="pipeline-dsl")
             shell(["make", "install"], cwd="pipeline-dsl")
             urllib.request.urlretrieve("https://cki-concourse.istio.sapcloud.io/api/v1/cli?arch=amd64&platform=linux", "/usr/bin/fly")
             os.chmod("/usr/bin/fly", stat.S_IEXEC | stat.S_IREAD)
@@ -61,6 +57,7 @@ with Pipeline("pipeline-dsl", team="garden", image_resource=DEFAULT_IMAGE) as pi
 
         @job.task()
         def ensure_coverage():
+            shell(["python3", "-m", "pip", "install", "-r", "requirements.txt"], cwd="pipeline-dsl")
             shell(["make", "coverage"], cwd="pipeline-dsl")
             repjson = subprocess.check_output(["coverage", "json", "-o", "-"], cwd="pipeline-dsl")
             report = json.loads(repjson)
@@ -81,11 +78,11 @@ with Pipeline("pipeline-dsl", team="garden", image_resource=DEFAULT_IMAGE) as pi
 
         @job.task(outputs=["repo_out"])
         def set_dev_version(repo_out):
-          update_version(re.sub("-rc.*", "-dev", version.version()), repo, repo_out + "/git")
+            update_version(re.sub("-rc.*", "-dev", version.version()), repo, repo_out + "/git")
 
         with job.in_parallel() as outputs:
-          outputs.put("version", params={"file": "version/version"})
-          outputs.put("pipeline-dsl", params={"repository": "repo_out/git"})
+            outputs.put("version", params={"file": "version/version"})
+            outputs.put("pipeline-dsl", params={"repository": "repo_out/git"})
 
     with pipeline.job("bump-minor") as job:
         with job.in_parallel() as inputs:
@@ -94,11 +91,11 @@ with Pipeline("pipeline-dsl", team="garden", image_resource=DEFAULT_IMAGE) as pi
 
         @job.task(outputs=["repo_out"])
         def set_dev_version(repo_out):
-          update_version(re.sub("-rc.*", "-dev", version.version()), repo, repo_out + "/git")
+            update_version(re.sub("-rc.*", "-dev", version.version()), repo, repo_out + "/git")
 
         with job.in_parallel() as outputs:
-          outputs.put("version", params={"file": "version/version"})
-          outputs.put("pipeline-dsl", params={"repository": "repo_out/git"})
+            outputs.put("version", params={"file": "version/version"})
+            outputs.put("pipeline-dsl", params={"repository": "repo_out/git"})
 
     with pipeline.job("bump-major") as job:
         with job.in_parallel() as inputs:
@@ -107,11 +104,11 @@ with Pipeline("pipeline-dsl", team="garden", image_resource=DEFAULT_IMAGE) as pi
 
         @job.task(outputs=["repo_out"])
         def set_dev_version(repo_out):
-          update_version(re.sub("-rc.*", "-dev", version.version()), repo, repo_out + "/git")
+            update_version(re.sub("-rc.*", "-dev", version.version()), repo, repo_out + "/git")
 
         with job.in_parallel() as outputs:
-          outputs.put("version", params={"file": "version/version"})
-          outputs.put("pipeline-dsl", params={"repository": "repo_out/git"})
+            outputs.put("version", params={"file": "version/version"})
+            outputs.put("pipeline-dsl", params={"repository": "repo_out/git"})
 
     with pipeline.job("rc") as job:
         with job.in_parallel() as inputs:
@@ -127,16 +124,15 @@ with Pipeline("pipeline-dsl", team="garden", image_resource=DEFAULT_IMAGE) as pi
 
         @job.task(outputs=["repo_out"])
         def prepare_repo(repo_out):
-          update_version(version.version(), repo, repo_out + "/git")
-          shell(["make", "dist"], cwd=repo_out + "/git")
+            update_version(version.version(), repo, repo_out + "/git")
+            shell(["make", "dist"], cwd=repo_out + "/git")
 
         with job.in_parallel() as outputs:
-          outputs.put("pipeline-dsl", params={"repository": "repo_out/git", "tag": "version/version", "tag_prefix": "v"})
-          outputs.put("version", params={"file": "version/version"})
+            outputs.put("pipeline-dsl", params={"repository": "repo_out/git", "tag": "version/version", "tag_prefix": "v"})
+            outputs.put("version", params={"file": "version/version"})
 
         job.put("pypi", params={"glob": "repo_out/git/dist/*.tar.gz"})
 
         @job.task()
         def verify_publish():
-          shell(["pip3", "install", "pipeline-dsl==" + version.version()])
-
+            shell(["pip3", "install", "pipeline-dsl==" + version.version()])

@@ -1,7 +1,10 @@
 from pipeline_dsl import Pipeline, PutStep, GetStep, DoStep, GitRepo
+from mock import patch
 import unittest
+import sys
 
 
+@patch.object(sys, "argv", ["test"])
 class TestJobSimple(unittest.TestCase):
     def test_basic(self):
         with Pipeline("test", script_dirs={"fake": "fake_scripts"}) as pipeline:
