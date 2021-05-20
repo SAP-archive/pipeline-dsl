@@ -1,4 +1,5 @@
 SHELL := /bin/bash
+TARGET_CICD_IMAGE := "europe-west3-docker.pkg.dev/sap-se-gcp-istio-dev/public/cicd_pipeline_dsl:latest"
 
 build: pipeline_dsl/*.py
 	python3 setup.py build
@@ -25,3 +26,9 @@ coverage:
 	PYTHONPATH=$$(pwd) coverage run --include=./* -m unittest
 	coverage html
 	coverage report --fail-under=75
+
+docker-build:
+	docker build -t ${TARGET_CICD_IMAGE} concourse/docker
+
+docker-push: docker-build
+	docker push ${TARGET_CICD_IMAGE}
