@@ -27,8 +27,8 @@ coverage:
 	coverage html
 	coverage report --fail-under=75
 
-docker-build:
+cicd-image-build:
 	docker build -t ${TARGET_CICD_IMAGE} concourse/docker
 
-docker-push: docker-build
+cicd-image-push: cicd-image-build
 	docker push ${TARGET_CICD_IMAGE}
