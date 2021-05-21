@@ -19,7 +19,7 @@ def vault_secret_manager(key):
 
 
 class Pipeline:
-    def __init__(self, name, image_resource={"type": "registry-image", "source": {"repository": "python", "tag": "3.8-buster"}}, script_dirs={}, team="main"):
+    def __init__(self, name, image_resource={"type": "registry-image", "source": {"repository": "python", "tag": "3.8-buster"}}, script_dirs={}, file_types=None, team="main"):
         frame = inspect.stack()[1]
         module = inspect.getmodule(frame[0])
         self.script = module.__file__
@@ -42,6 +42,7 @@ class Pipeline:
         self.resource_types = {}
         self.name = name
         self.image_resource = image_resource
+        self.file_types = file_types
         self.team = team
         self.secret_manager = env_secret_manager
 
@@ -95,7 +96,17 @@ class Pipeline:
 
     def job(self, name, serial=False, serial_groups=[], old_name=None, groups=[]):
         result = Job(
-            name, self.script, self.init_dirs, self.image_resource, self.resource_chains, self.__create_secret_manager(), serial=serial, serial_groups=serial_groups, old_name=old_name, groups=groups
+            name,
+            self.script,
+            self.init_dirs,
+            self.image_resource,
+            self.resource_chains,
+            self.__create_secret_manager(),
+            serial=serial,
+            serial_groups=serial_groups,
+            old_name=old_name,
+            groups=groups,
+            file_types=self.file_types,
         )
         self.jobs.append(result)
         self.jobs_by_name[name] = result

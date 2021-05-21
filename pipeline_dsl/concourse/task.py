@@ -3,6 +3,7 @@ import json
 import base64
 import tarfile
 import io
+import pathlib
 
 from .__shared import CACHE_DIR, SCRIPT_DIR, concourse_context
 
@@ -88,18 +89,26 @@ class Task:
         return concourse
 
 
+DEFAULT_FILE_TYPES = [".sh", ".py"]
+
+
 class InitTask:
-    def __init__(self, init_dirs, image_resource):
+    def __init__(self, init_dirs, image_resource, file_types=None):
         self.init_dirs = init_dirs
         self.image_resource = image_resource
+        self.file_types = file_types or DEFAULT_FILE_TYPES
 
     def package(self):
         buffer = io.BytesIO()
         tar = tarfile.open(fileobj=buffer, mode="x:bz2")
         init_dirs = sorted(list(self.init_dirs.items()), key=lambda d: len(d[1]), reverse=True)
 
+        def check_file_type(filename):
+            suffix = pathlib.Path(filename).suffix
+            return suffix in self.file_types
+
         def filter(tarinfo):
-            if not (tarinfo.isdir() or tarinfo.name.endswith(".sh") or tarinfo.name.endswith(".py")):
+            if not (tarinfo.isdir() or check_file_type(tarinfo.name)):
                 return None
             tarinfo.uid = 0
             tarinfo.gid = 0

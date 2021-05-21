@@ -7,11 +7,11 @@ from .task import InitTask, Task
 
 
 class Job:
-    def __init__(self, name, script, init_dirs, image_resource, resource_chains, secret_manager, serial, serial_groups, old_name, groups):
+    def __init__(self, name, script, init_dirs, image_resource, resource_chains, secret_manager, serial, serial_groups, old_name, groups, file_types=None):
         self.name = name
         self.groups = groups
         self.old_name = old_name
-        self.plan = [InitTask(init_dirs, image_resource)]
+        self.plan = [InitTask(init_dirs, image_resource, file_types)]
         self.image_resource = image_resource
         self.resource_chains = resource_chains
         self.script = script
