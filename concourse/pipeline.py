@@ -4,9 +4,6 @@ import re
 import urllib.request
 import os
 import stat
-import subprocess
-import json
-import sys
 
 DEFAULT_IMAGE = {
     "type": "docker-image",
@@ -72,7 +69,7 @@ with Pipeline("pipeline-dsl", team="garden", image_resource=DEFAULT_IMAGE) as pi
             repo = inputs.get("pipeline-dsl", passed=[])
 
         @job.task(outputs=["repo_out"])
-        def set_dev_version(repo_out):
+        def set_dev_version_patch(repo_out):
             update_version(re.sub("-rc.*", "-dev", version.version()), repo, repo_out + "/git")
 
         with job.in_parallel() as outputs:
@@ -85,7 +82,7 @@ with Pipeline("pipeline-dsl", team="garden", image_resource=DEFAULT_IMAGE) as pi
             repo = inputs.get("pipeline-dsl", passed=[])
 
         @job.task(outputs=["repo_out"])
-        def set_dev_version(repo_out):
+        def set_dev_version_minor(repo_out):
             update_version(re.sub("-rc.*", "-dev", version.version()), repo, repo_out + "/git")
 
         with job.in_parallel() as outputs:
@@ -98,7 +95,7 @@ with Pipeline("pipeline-dsl", team="garden", image_resource=DEFAULT_IMAGE) as pi
             repo = inputs.get("pipeline-dsl", passed=[])
 
         @job.task(outputs=["repo_out"])
-        def set_dev_version(repo_out):
+        def set_dev_version_major(repo_out):
             update_version(re.sub("-rc.*", "-dev", version.version()), repo, repo_out + "/git")
 
         with job.in_parallel() as outputs:
