@@ -8,10 +8,8 @@ import stat
 DEFAULT_IMAGE = {
     "type": "docker-image",
     "source": {
-        "repository": "gcr.io/sap-se-gcp-istio-dev/ci-image",
-        "tag": "latest",
-        "username": "_json_key",
-        "password": "((IMAGE_PULL_SECRETS))",
+        "repository": "europe-west3-docker.pkg.dev/sap-se-gcp-istio-dev/public/cicd_pipeline_dsl",
+        "tag": "latest"
     },
 }
 
