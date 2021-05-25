@@ -1,0 +1,39 @@
+# This workflow will install Python dependencies, run tests and lint with a single version of Python
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+
+name: Python application
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  lint-and-test:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.7
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.7
+    - name: Install dependencies
+      run: |
+        python3 -m pip install --upgrade pip
+        python3 -m pip install coverage
+        pip install flake8 black
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+    - name: Lint with flake8
+      run: |
+        flake8 .  --max-line-length 1337 --extend-ignore E203 --statistics --exclude __init__.py
+    - name: black
+      run: |
+        black --check --line-length 200 .
+    - name: Test with unittest
+      run: |
+        python3 -m"unittest"
+    - name: Ensure coverage
+      run: |
+        coverage run --include=./* -m unittest
+        coverage report --fail-under=75
