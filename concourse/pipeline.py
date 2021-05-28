@@ -9,7 +9,7 @@ DEFAULT_IMAGE = {
     "type": "docker-image",
     "source": {
         "repository": "europe-west3-docker.pkg.dev/sap-se-gcp-istio-dev/public/cicd_pipeline_dsl",
-        "tag": "latest"
+        "tag": "latest",
     },
 }
 
