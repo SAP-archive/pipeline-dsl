@@ -1,6 +1,6 @@
 from pipeline_dsl.resources.resource import AbstractResource, ConcourseResource
 from pipeline_dsl.concourse import concourse_context
-from typing import Dict, Optional, Collection, Union
+from typing import Dict, Optional
 import os
 
 
@@ -9,7 +9,7 @@ class RegistryImageResource:
         self.name = name
         self.path = os.path.abspath(self.name)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
     def tag(self, default: Optional[str] = None) -> Optional[str]:

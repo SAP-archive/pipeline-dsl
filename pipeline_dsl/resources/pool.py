@@ -1,4 +1,4 @@
-from typing import Optional, Dict, Collection
+from typing import Optional, Dict
 from pipeline_dsl.resources.resource import AbstractResource, ConcourseResource
 
 

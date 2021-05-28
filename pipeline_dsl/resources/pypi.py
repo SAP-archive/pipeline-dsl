@@ -1,4 +1,4 @@
-from typing import Optional, Dict, Collection
+from typing import Optional, Dict
 from pipeline_dsl.resources.resource import AbstractResource, ConcourseResource
 
 
@@ -21,7 +21,7 @@ class PyPi(AbstractResource):
     def get(self, name: str) -> "PyPi":
         return self
 
-    def concourse(self, name) -> ConcourseResource:
+    def concourse(self, name: str) -> ConcourseResource:
         result = ConcourseResource(
             name=name,
             type="pypi",
