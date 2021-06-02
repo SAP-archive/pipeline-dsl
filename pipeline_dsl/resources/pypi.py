@@ -1,9 +1,9 @@
-from typing import Optional, Dict
 from pipeline_dsl.resources.resource import AbstractResource, ConcourseResource
+from typing import Optional, Dict
 
 
 class PyPi(AbstractResource):
-    def __init__(self, name: str, username: str, password: str):
+    def __init__(self, name: str, username: str, password: str) -> None:
         self.name = name
         self.username = username
         self.password = password
