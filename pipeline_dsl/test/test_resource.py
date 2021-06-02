@@ -9,13 +9,13 @@ class TestGitResource(unittest.TestCase):
         repo = GitRepo("https://example.com/repo.git", git_config={"user.name": "unknown", "user.email": "unknown@example.com"})
 
         obj = repo.concourse(name="test")
-        self.assertDictEqual(
+        self.assertEqual(
             obj,
-            {
-                "name": "test",
-                "type": "git",
-                "icon": "git",
-                "source": {
+            ConcourseResource(
+                name="test",
+                type="git",
+                icon="git",
+                source={
                     "uri": "https://example.com/repo.git",
                     "git_config": [
                         {
@@ -28,7 +28,7 @@ class TestGitResource(unittest.TestCase):
                         },
                     ],
                 },
-            },
+            ),
         )
 
     def test_path(self):
@@ -42,17 +42,17 @@ class TestCronResource(unittest.TestCase):
         repo = Cron("definition")
 
         obj = repo.concourse("test")
-        self.assertDictEqual(
+        self.assertEqual(
             obj,
-            {
-                "name": "test",
-                "type": "cron",
-                "icon": "clock-outline",
-                "source": {
+            ConcourseResource(
+                name="test",
+                type="cron",
+                icon="clock-outline",
+                source={
                     "cron": "definition",
                     "location": "Europe/Berlin",
                 },
-            },
+            ),
         )
 
         obj = repo.resource_type()
@@ -74,19 +74,19 @@ class TestDockerImageResource(unittest.TestCase):
         resource = DockerImage("repo", "username", "password", "tag")
 
         obj = resource.concourse("test")
-        self.assertDictEqual(
+        self.assertEqual(
             obj,
-            {
-                "name": "test",
-                "type": "docker-image",
-                "icon": "docker",
-                "source": {
+            ConcourseResource(
+                name="test",
+                type="docker-image",
+                icon="docker",
+                source={
                     "repository": "repo",
                     "username": "username",
                     "password": "password",
                     "tag": "tag",
                 },
-            },
+            ),
         )
 
         location = resource.get("test")
@@ -98,18 +98,18 @@ class TestGoogleCloudStorageResource(unittest.TestCase):
         resource = GoogleCloudStorage("bucket", "regexp", "credentials")
 
         obj = resource.concourse("test")
-        self.assertDictEqual(
+        self.assertEqual(
             obj,
-            {
-                "name": "test",
-                "type": "gcs",
-                "icon": "file-cloud",
-                "source": {
+            ConcourseResource(
+                name="test",
+                type="gcs",
+                icon="file-cloud",
+                source={
                     "bucket": "bucket",
                     "regexp": "regexp",
                     "json_key": "credentials",
                 },
-            },
+            ),
         )
 
         self.assertDictEqual(
@@ -164,13 +164,13 @@ class TestGithubResource(unittest.TestCase):
         resource = GithubRelease("owner", "repo", "access_token", pre_release=True, release=False, github_api_url="github_api_url/v3", github_uploads_url="github_uploads_url")
 
         obj = resource.concourse("test")
-        self.assertDictEqual(
+        self.assertEqual(
             obj,
-            {
-                "name": "test",
-                "type": "github-release",
-                "icon": "github",
-                "source": {
+            ConcourseResource(
+                name="test",
+                type="github-release",
+                icon="github",
+                source={
                     "owner": "owner",
                     "repository": "repo",
                     "access_token": "access_token",
@@ -180,7 +180,7 @@ class TestGithubResource(unittest.TestCase):
                     "github_v4_api_url": "github_api_url/graphql",
                     "github_uploads_url": "github_uploads_url",
                 },
-            },
+            ),
         )
 
 
@@ -201,13 +201,13 @@ class TestSemVerResource(unittest.TestCase):
         )
         obj = resource.concourse("test")
 
-        self.assertDictEqual(
+        self.assertEqual(
             obj,
-            {
-                "name": "test",
-                "type": "semver",
-                "icon": "creation",
-                "source": {
+            ConcourseResource(
+                name="test",
+                type="semver",
+                icon="creation",
+                source={
                     "driver": "git",
                     "uri": "git@github.com:concourse/concourse.git",
                     "branch": "version",
@@ -219,7 +219,7 @@ class TestSemVerResource(unittest.TestCase):
                     "skip_ssl_verification": True,
                     "commit_message": "Commit Message",
                 },
-            },
+            ),
         )
 
     def test_password(self):
@@ -238,13 +238,13 @@ class TestSemVerResource(unittest.TestCase):
         )
         obj = resource.concourse("test")
 
-        self.assertDictEqual(
+        self.assertEqual(
             obj,
-            {
-                "name": "test",
-                "type": "semver",
-                "icon": "creation",
-                "source": {
+            ConcourseResource(
+                name="test",
+                type="semver",
+                icon="creation",
+                source={
                     "driver": "git",
                     "uri": "git@github.com:concourse/concourse.git",
                     "branch": "version",
@@ -256,7 +256,7 @@ class TestSemVerResource(unittest.TestCase):
                     "skip_ssl_verification": True,
                     "commit_message": "Commit Message",
                 },
-            },
+            ),
         )
 
 
@@ -289,19 +289,19 @@ class TestGithubPRResource(unittest.TestCase):
 
         obj = resource.concourse("test")
 
-        self.assertDictEqual(
+        self.assertEqual(
             obj,
-            {
-                "name": "test",
-                "type": "github-pr",
-                "icon": "source-pull",
-                "source": {
+            ConcourseResource(
+                name="test",
+                type="github-pr",
+                icon="source-pull",
+                source={
                     "repository": "torvalds/linux",
                     "access_token": "((GITHUB_TOKEN))",
                     "skip_ssl_verification": True,
                     "v3_endpoint": "https://api.example.com",
                 },
-            },
+            ),
         )
 
 
