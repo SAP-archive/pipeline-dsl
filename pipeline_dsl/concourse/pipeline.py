@@ -1,5 +1,6 @@
 import sys
 import os
+import glob
 import shutil
 import subprocess
 import argparse
@@ -35,7 +36,8 @@ class Pipeline:
                 self.init_dirs[os.path.basename(dir)] = dir
         else:
             for key, script in script_dirs.items():
-                self.init_dirs[key] = os.path.abspath(os.path.join(dirname, script))
+                globed = glob.glob(os.path.abspath((os.path.join(dirname, script))))
+                self.init_dirs[key] = globed
         self.jobs = []
         self.jobs_by_name = {}
         self.resource_chains = {}

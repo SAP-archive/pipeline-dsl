@@ -26,7 +26,7 @@ TEST_DIR = os.path.abspath(os.path.dirname(__file__))
 @patch.object(sys, "argv", ["test"])
 class TestPipeline(unittest.TestCase):
     def test_init_task(self):
-        with Pipeline("test", script_dirs={"fake": "fake_scripts"}) as pipeline:
+        with Pipeline("test", script_dirs={"fake": "fake_scripts", "fake_glob": "fake_scripts/*.yaml"}) as pipeline:
             with pipeline.job("job") as job:
 
                 @job.task()
@@ -44,7 +44,8 @@ class TestPipeline(unittest.TestCase):
                 {
                     "starter": TEST_DIR,
                     "pythonpath/pipeline_dsl": os.path.dirname(TEST_DIR),
-                    "fake": os.path.join(TEST_DIR, "fake_scripts"),
+                    "fake": [os.path.join(TEST_DIR, "fake_scripts")],
+                    "fake_glob": [os.path.join(TEST_DIR, "fake_scripts/test.yaml")],
                 },
             )
             data = init_task.package()
@@ -54,7 +55,8 @@ class TestPipeline(unittest.TestCase):
             self.assertIn(STOP_SCRIPT, files)
             self.assertIn("fake/test.sh", files)
 
-            self.assertEqual(pipeline.script_dir("fake"), os.path.join(TEST_DIR, "fake_scripts"))
+            self.assertEqual(pipeline.script_dir("fake"), [os.path.join(TEST_DIR, "fake_scripts")])
+            self.assertEqual(len(pipeline.script_dir("fake_glob")), 1)
 
             with concourse_ctx():
                 self.assertEqual(pipeline.script_dir("fake"), os.path.abspath("scripts/fake"))
