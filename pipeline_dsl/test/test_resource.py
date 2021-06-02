@@ -1,6 +1,6 @@
 import unittest
 import os
-from pipeline_dsl.resources import GitRepo, Cron, DockerImage, GoogleCloudStorage, Pool, GithubRelease, SemVer, SemVerGitDriver, RegistryImage, GithubPR
+from pipeline_dsl.resources import GitRepo, Cron, DockerImage, GoogleCloudStorage, Pool, GithubRelease, SemVer, SemVerGitDriver, RegistryImage, GithubPR, ConcourseResource
 from pipeline_dsl.concourse.__shared import concourse_ctx
 
 
@@ -130,20 +130,20 @@ class TestPoolResource(unittest.TestCase):
         resource = Pool("uri", "branch", "pool", "username", "password")
 
         obj = resource.concourse("test")
-        self.assertDictEqual(
+        self.assertEqual(
             obj,
-            {
-                "name": "test",
-                "type": "pool-stable",
-                "icon": "lock",
-                "source": {
+            ConcourseResource(
+                name="test",
+                type="pool-stable",
+                icon="lock",
+                source={
                     "uri": "uri",
                     "branch": "branch",
                     "pool": "pool",
                     "username": "username",
                     "password": "password",
                 },
-            },
+            ),
         )
 
         self.assertDictEqual(
@@ -266,19 +266,20 @@ class TestRegistryImageResource(unittest.TestCase):
 
         obj = resource.concourse("test")
 
-        self.assertDictEqual(
+        self.assertEqual(
             obj,
-            {
-                "name": "test",
-                "type": "registry-image",
-                "source": {
+            ConcourseResource(
+                name="test",
+                type="registry-image",
+                icon="docker",
+                source={
                     "repository": "repo",
                     "username": "user",
                     "password": "password",
                     "tag": "tag",
                     "variant": "variant",
                 },
-            },
+            ),
         )
 
 

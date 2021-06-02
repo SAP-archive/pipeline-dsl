@@ -1,49 +1,52 @@
-import os
+from pipeline_dsl.resources.resource import AbstractResource, ConcourseResource
 from pipeline_dsl.concourse import concourse_context
+from typing import Dict, Optional
+import os
 
 
 class RegistryImageResource:
-    def __init__(self, name):
+    def __init__(self, name: str):
         self.name = name
         self.path = os.path.abspath(self.name)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
-    def tag(self, default=None):
+    def tag(self, default: Optional[str] = None) -> Optional[str]:
         if concourse_context():
             with open(os.path.join(self.path, "tag")) as f:
                 return f.read().strip()
         return default
 
 
-class RegistryImage:
-    def __init__(self, repo, username=None, password=None, tag=None, variant=None):
+class RegistryImage(AbstractResource[RegistryImageResource]):
+    def __init__(self, repo: str, username: str = None, password: str = None, tag: str = None, variant: str = None):
         self.repo = repo
         self.username = username
         self.password = password
         self.tag = tag
         self.variant = variant
 
-    def resource_type(self):
+    def resource_type(self) -> Optional[Dict]:
         return None
 
-    def concourse(self, name):
-        result = {
-            "name": name,
-            "type": "registry-image",
-            "source": {
+    def concourse(self, name: str) -> ConcourseResource:
+        result = ConcourseResource(
+            name=name,
+            type="registry-image",
+            icon="docker",
+            source={
                 "repository": self.repo,
                 "username": self.username,
                 "password": self.password,
                 "tag": self.tag,
                 "variant": self.variant,
             },
-        }
-        result["source"] = dict(
-            filter(lambda x: x[1] is not None, result["source"].items()),
+        )
+        result.source = dict(
+            filter(lambda x: x[1] is not None, result.source.items()),
         )
         return result
 
-    def get(self, name):
+    def get(self, name: str) -> RegistryImageResource:
         return RegistryImageResource(name)
