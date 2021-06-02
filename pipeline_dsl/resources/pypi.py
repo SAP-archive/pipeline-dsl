@@ -2,7 +2,7 @@ from pipeline_dsl.resources.resource import AbstractResource, ConcourseResource
 from typing import Optional, Dict
 
 
-class PyPi(AbstractResource):
+class PyPi(AbstractResource["PyPi"]):
     def __init__(self, name: str, username: str, password: str) -> None:
         self.name = name
         self.username = username

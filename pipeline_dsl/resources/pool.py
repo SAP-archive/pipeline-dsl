@@ -2,7 +2,7 @@ from pipeline_dsl.resources.resource import AbstractResource, ConcourseResource
 from typing import Optional, Dict
 
 
-class Pool(AbstractResource):
+class Pool(AbstractResource["Pool"]):
     def __init__(self, uri: str, branch: str, pool: str, username: str, password: str) -> None:
         self.uri = uri
         self.branch = branch

@@ -2,7 +2,7 @@ from pipeline_dsl.resources.resource import AbstractResource, ConcourseResource
 from typing import Optional, Dict
 
 
-class GoogleCloudStorage(AbstractResource):
+class GoogleCloudStorage(AbstractResource["GoogleCloudStorage"]):
     def __init__(self, bucket: str, regexp: str, credentials: str) -> None:
         self.bucket = bucket
         self.regexp = regexp

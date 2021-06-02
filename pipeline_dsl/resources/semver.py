@@ -45,15 +45,7 @@ class SemVer(AbstractResource[SemVerResource]):
 
 class SemVerDriver(ABC):
     @abstractmethod
-    def resource_type(self) -> Optional[Dict]:
-        pass
-
-    @abstractmethod
     def concourse(self) -> Dict[str, Any]:
-        pass
-
-    @abstractmethod
-    def get(self) -> None:
         pass
 
 
@@ -82,9 +74,6 @@ class SemVerGitDriver(SemVerDriver):
         self.skip_ssl_verification = skip_ssl_verification
         self.commit_message = commit_message
 
-    def resource_type(self) -> Optional[Dict]:
-        return None
-
     def concourse(self) -> Dict[str, Any]:
         result = {
             "driver": "git",
@@ -103,6 +92,3 @@ class SemVerGitDriver(SemVerDriver):
         return dict(
             filter(lambda x: x[1] is not None, result.items()),
         )
-
-    def get(self) -> None:
-        return None

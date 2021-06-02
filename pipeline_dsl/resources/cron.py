@@ -2,7 +2,7 @@ from pipeline_dsl.resources.resource import AbstractResource, ConcourseResource
 from typing import Optional, Dict
 
 
-class Cron(AbstractResource):
+class Cron(AbstractResource[None]):
     def __init__(self, definition: str) -> None:
         self.definition = definition
 
