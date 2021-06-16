@@ -97,6 +97,48 @@ class TestPipeline(unittest.TestCase):
                 concourse["groups"],
             )
 
+    def test_script_dirs_list(self):
+        with Pipeline("test", script_dirs=["fake_scripts/*.yaml", "fake_scripts/test.yaml", __file__]) as pipeline:
+            with pipeline.job("job") as job:
+
+                @job.task()
+                def task():
+                    pass
+
+            self.assertEqual(len(pipeline.jobs), 1)
+            job = pipeline.jobs[0]
+            self.assertEqual(len(job.plan), 2)
+
+            init_task = job.plan[0]
+            self.assertTrue(isinstance(init_task, InitTask))
+            self.assertEqual(
+                init_task.init_dirs,
+                {
+                    "starter": TEST_DIR,
+                    "pythonpath/pipeline_dsl": os.path.dirname(TEST_DIR),
+                    __file__: [__file__],
+                    "fake_scripts": [os.path.join(TEST_DIR, "fake_scripts/test.yaml")],
+                    "fake_scripts/test.yaml": [os.path.join(TEST_DIR, "fake_scripts/test.yaml")],
+                },
+            )
+            data = init_task.package()
+            files = subprocess.check_output(["tar", "tjf", "-"], input=base64.b64decode(data)).decode("utf-8").split()
+            self.assertIn(__file__[1:], files)
+            self.assertIn("fake_scripts", files)
+            self.assertIn("fake_scripts/test.yaml", files)
+
+            self.assertEqual(pipeline.script_dir("fake_scripts"), [os.path.join(TEST_DIR, "fake_scripts/test.yaml")])
+            self.assertEqual(len(pipeline.script_dir("fake_scripts")), 1)
+            self.assertEqual(pipeline.script_dir("fake_scripts/test.yaml"), [os.path.join(TEST_DIR, "fake_scripts/test.yaml")])
+            self.assertEqual(len(pipeline.script_dir("fake_scripts/test.yaml")), 1)
+            self.assertEqual(pipeline.script_dir(__file__), [__file__])
+            self.assertEqual(len(pipeline.script_dir(__file__)), 1)
+
+            with concourse_ctx():
+                self.assertEqual(pipeline.script_dir("fake_scripts"), os.path.abspath("scripts/fake_scripts"))
+                self.assertEqual(pipeline.script_dir("fake_scripts/test.yaml"), os.path.abspath("scripts/fake_scripts/test.yaml"))
+                self.assertEqual(pipeline.script_dir(__file__), __file__)
+
 
 if __name__ == "__main__":
     unittest.main()

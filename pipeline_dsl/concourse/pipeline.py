@@ -32,8 +32,12 @@ class Pipeline:
         }
         if isinstance(script_dirs, list):
             for script in script_dirs:
-                dir = os.path.abspath(os.path.join(dirname, script))
-                self.init_dirs[os.path.basename(dir)] = dir
+                globed = glob.glob(os.path.abspath((os.path.join(dirname, script))))
+                if len(globed) == 1 and globed[0] == os.path.join(dirname, script):
+                    key = script
+                else:
+                    key = os.path.dirname(script)
+                self.init_dirs[key] = globed
         else:
             for key, script in script_dirs.items():
                 globed = glob.glob(os.path.abspath((os.path.join(dirname, script))))
