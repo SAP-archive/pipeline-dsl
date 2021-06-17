@@ -7,7 +7,7 @@ build: pipeline_dsl/*.py
 install: build
 	python3 setup.py install
 
-test: test-examples test-unit
+test: test-examples test-unit mypy
 
 test-examples:
 	@set -euo pipefail; \
@@ -18,6 +18,9 @@ test-examples:
 
 test-unit:
 	PYTHONPATH=$$(pwd) python3 -m"unittest"
+
+mypy:
+	mypy pipeline_dsl/
 
 dist:
 	python3 setup.py sdist

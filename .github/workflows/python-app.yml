@@ -22,6 +22,7 @@ jobs:
       run: |
         python3 -m pip install --upgrade pip
         python3 -m pip install coverage
+        python3 -m pip install mypy
         pip install flake8 black
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Lint with flake8
@@ -37,3 +38,6 @@ jobs:
       run: |
         coverage run --include=./* -m unittest
         coverage report --fail-under=75
+    - name: Run mypy
+      run: |
+        mypy pipeline_dsl/
