@@ -9,5 +9,8 @@ RUN apt-get update \
   # cleanup
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*
+
+RUN pip3 install --no-cache-dir mypy
+
 # workaround needed because of hardcoded path in pipeline_dsl: Task.init()
 RUN ln -s /usr/local/bin/python3 /usr/bin/python3

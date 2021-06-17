@@ -152,6 +152,7 @@ class Pipeline:
                 sys.exit(1)
 
     def __print_error(self, e: Exception):
+        assert e.__traceback__  # TODO: __traceback__ might be None, how should we handle this? print(e)?
         frames = inspect.getinnerframes(e.__traceback__)
         BOLD_ERROR = "\033[31;1m  *  "
         NORMAL_ERROR = "\033[31m     "

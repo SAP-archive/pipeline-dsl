@@ -50,6 +50,13 @@ with Pipeline("pipeline-dsl", team="garden", image_resource=DEFAULT_IMAGE) as pi
 
             shell(["make", "test"], cwd=cwd)
 
+    with pipeline.job("lint") as job:
+        pipeline_dsl = job.get("pipeline-dsl", trigger=True, passed=[])
+
+        @job.task()
+        def lint():
+            shell(["make", "lint"], cwd=pipeline_dsl.directory())
+
     with pipeline.job("coverage") as job:
         pipeline_dsl = job.get("pipeline-dsl", trigger=True)
 

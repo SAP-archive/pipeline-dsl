@@ -22,11 +22,14 @@ jobs:
       run: |
         python3 -m pip install --upgrade pip
         python3 -m pip install coverage
-        pip install flake8 black
+        pip install flake8 black mypy
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Lint with flake8
       run: |
         flake8 .  --max-line-length 1337 --extend-ignore E203 --statistics --exclude __init__.py
+    - name: Lint with mypy
+      run: |
+        mypy pipeline_dsl/
     - name: black
       run: |
         black --check --line-length 200 .

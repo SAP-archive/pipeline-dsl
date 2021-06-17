@@ -19,6 +19,11 @@ test-examples:
 test-unit:
 	PYTHONPATH=$$(pwd) python3 -m"unittest"
 
+lint: lint-mypy
+
+lint-mypy:
+	mypy pipeline_dsl/
+
 dist:
 	python3 setup.py sdist
 
