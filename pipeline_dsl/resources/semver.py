@@ -1,47 +1,68 @@
-import os
+from pipeline_dsl.resources.resource import AbstractResource, ConcourseResource
 from pipeline_dsl.concourse import concourse_context
+from typing import Optional, Dict, Any
+from abc import ABC, abstractmethod
+import os
 
 
 class SemVerResource:
-    def __init__(self, name):
+    def __init__(self, name: str) -> None:
         self.name = name
         self.path = os.path.abspath(self.name)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
-    def version(self):
+    def version(self) -> str:
         if concourse_context():
             with open(os.path.join(self.path, "version")) as f:
                 return f.read().strip()
         return "0.0.1"
 
 
-class SemVer:
-    def __init__(self, source, initial_version=None):
-        self.source = source
+class SemVer(AbstractResource[SemVerResource]):
+    def __init__(self, driver: "SemVerDriver", initial_version: str = None):
+        self.driver = driver
         self.initial_version = initial_version
 
-    def resource_type(self):
+    def resource_type(self) -> Optional[dict]:
         return None
 
-    def concourse(self, name):
-        result = {
-            "name": name,
-            "type": "semver",
-            "icon": "creation",
-            "source": self.source.concourse(),
-        }
+    def concourse(self, name: str) -> ConcourseResource:
+        result = ConcourseResource(
+            name=name,
+            type="semver",
+            icon="creation",
+            source=self.driver.concourse(),
+        )
         if self.initial_version is not None:
-            result["source"]["initial_version"] = self.initial_version
+            result.source["initial_version"] = self.initial_version
         return result
 
-    def get(self, name):
+    def get(self, name: str) -> SemVerResource:
         return SemVerResource(name)
 
 
-class SemVerGitDriver:
-    def __init__(self, uri, branch, file, private_key=None, username=None, password=None, git_user=None, depth=None, skip_ssl_verification=None, commit_message=None):
+class SemVerDriver(ABC):
+    @abstractmethod
+    def concourse(self) -> Dict[str, Any]:
+        pass
+
+
+class SemVerGitDriver(SemVerDriver):
+    def __init__(
+        self,
+        uri: str,
+        branch: str,
+        file: str,
+        private_key: str = None,
+        username: str = None,
+        password: str = None,
+        git_user: str = None,
+        depth: str = None,
+        skip_ssl_verification: bool = None,
+        commit_message: str = None,
+    ):
         self.uri = uri
         self.branch = branch
         self.file = file
@@ -53,10 +74,7 @@ class SemVerGitDriver:
         self.skip_ssl_verification = skip_ssl_verification
         self.commit_message = commit_message
 
-    def resource_type(self):
-        return None
-
-    def concourse(self):
+    def concourse(self) -> Dict[str, Any]:
         result = {
             "driver": "git",
             "uri": self.uri,
@@ -71,7 +89,6 @@ class SemVerGitDriver:
             "commit_message": self.commit_message,
         }
 
-        return dict(filter(lambda x: x[1] is not None, result.items()))
-
-    def get(self, name):
-        return None
+        return dict(
+            filter(lambda x: x[1] is not None, result.items()),
+        )

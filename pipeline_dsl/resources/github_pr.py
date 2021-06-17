@@ -1,27 +1,29 @@
-import os
-import json
+from pipeline_dsl.resources.resource import AbstractResource, ConcourseResource
 from pipeline_dsl.concourse import concourse_context
+from typing import Optional, Union, Dict, List
+import json
+import os
 
 
 class GithubPRResource:
-    def __init__(self, name):
+    def __init__(self, name: str) -> None:
         self.name = name
         self.path = os.path.abspath(self.name)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
-    def version(self, default=None):
+    def version(self, default: str = None) -> Optional[str]:
         if concourse_context():
             return json.load(open(os.path.join(self.path, ".git", "resource", "version.json")))
         return default
 
-    def metadata(self, default=None):
+    def metadata(self, default: str = None) -> Optional[str]:
         if concourse_context():
             return json.load(open(os.path.join(self.path, ".git", "resource", "metadata.json")))
         return default
 
-    def changed_files(self, default=None):
+    def changed_files(self, default: str = None) -> Union[List[str], Optional[str]]:
         if concourse_context():
             with open(os.path.join(self.path, ".git", "resource", "changed_files")) as f:
                 lines = f.readlines()
@@ -29,25 +31,25 @@ class GithubPRResource:
         return default
 
 
-class GithubPR:
+class GithubPR(AbstractResource[GithubPRResource]):
     def __init__(
         self,
-        repository,
-        access_token,
-        v3_endpoint=None,
-        v4_endpoint=None,
-        paths=None,
-        ignore_paths=None,
-        disable_ci_skip=None,
-        skip_ssl_verification=None,
-        disable_forks=None,
-        ignore_drafts=None,
-        required_review_approvals=None,
-        git_crypt_key=None,
-        base_branch=None,
-        labels=None,
-        disable_git_lfs=None,
-        states=None,
+        repository: str,
+        access_token: str,
+        v3_endpoint: str = None,
+        v4_endpoint: str = None,
+        paths: list = None,
+        ignore_paths: list = None,
+        disable_ci_skip: bool = None,
+        skip_ssl_verification: bool = None,
+        disable_forks: bool = None,
+        ignore_drafts: bool = None,
+        required_review_approvals: int = None,
+        git_crypt_key: str = None,
+        base_branch: str = None,
+        labels: list = None,
+        disable_git_lfs: bool = None,
+        states: list = None,
     ):
         self.repository = repository
         self.access_token = access_token
@@ -66,7 +68,7 @@ class GithubPR:
         self.disable_git_lfs = disable_git_lfs
         self.states = states
 
-    def resource_type(self):
+    def resource_type(self) -> Optional[Dict]:
         return {
             "name": "github-pr",
             "type": "docker-image",
@@ -76,12 +78,12 @@ class GithubPR:
             },
         }
 
-    def concourse(self, name):
-        result = {
-            "name": name,
-            "type": "github-pr",
-            "icon": "source-pull",
-            "source": {
+    def concourse(self, name: str) -> ConcourseResource:
+        result = ConcourseResource(
+            name=name,
+            type="github-pr",
+            icon="source-pull",
+            source={
                 "repository": self.repository,
                 "access_token": self.access_token,
                 "v3_endpoint": self.v3_endpoint,
@@ -99,11 +101,11 @@ class GithubPR:
                 "disable_git_lfs": self.disable_git_lfs,
                 "states": self.states,
             },
-        }
-        result["source"] = dict(
-            filter(lambda x: x[1] is not None, result["source"].items()),
+        )
+        result.source = dict(
+            filter(lambda x: x[1] is not None, result.source.items()),
         )
         return result
 
-    def get(self, name):
+    def get(self, name: str) -> GithubPRResource:
         return GithubPRResource(name)
