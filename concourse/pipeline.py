@@ -31,7 +31,7 @@ with Pipeline("pipeline-dsl", team="garden", image_resource=DEFAULT_IMAGE) as pi
         GitRepo(repo_url, private_key="((GITHUB_COM_DEPLOY_KEY))", ignore_paths=["concourse/*"], branch="stable"),
     )
 
-    pipeline.resource("version", SemVer(source=SemVerGitDriver(repo_url, private_key="((GITHUB_COM_DEPLOY_KEY))", branch="version", file="version"), initial_version="0.1.0"))
+    pipeline.resource("version", SemVer(driver=SemVerGitDriver(repo_url, private_key="((GITHUB_COM_DEPLOY_KEY))", branch="version", file="version"), initial_version="0.1.0"))
 
     pipeline.resource("pypi", PyPi(name="pipeline-dsl", username="((PYPI_USER.username))", password="((PYPI_USER.password))"))
 
