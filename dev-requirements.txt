@@ -1,0 +1,6 @@
+coverage
+black
+flake8
+mypy
+types-mock
+types-PyYAML
