@@ -4,6 +4,7 @@
 [![python](https://img.shields.io/badge/python-3.7-blue.svg)](https://pypi.org/project/pipeline-dsl/)
 [![pypi](https://img.shields.io/pypi/v/pipeline-dsl.svg)](https://pypi.org/project/pipeline-dsl/)
 [![license](https://img.shields.io/pypi/l/pipeline-dsl.svg)](https://pypi.org/project/pipeline-dsl/)
+[![REUSE status](https://api.reuse.software/badge/github.com/SAP/pipeline-dsl)](https://api.reuse.software/info/github.com/SAP/pipeline-dsl)
 
 ## Features
 
