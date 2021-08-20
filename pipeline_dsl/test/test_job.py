@@ -26,7 +26,7 @@ class TestJobSimple(unittest.TestCase):
         with Pipeline("test", script_dirs={"fake": "fake_scripts"}) as pipeline:
             job = pipeline.job("job")
 
-            job.on_success = PutStep("test_res_success", {"param": "success"})
+            job.on_success = PutStep("test_res_success", {"param": "success"}, get_params={"test": True})
             job.on_failure = PutStep("test_res_fail", {"param": "fail"})
             job.on_abort = PutStep("test_res_abort", {"param": "abort"})
             job.ensure = GetStep("test_res_ensure", False, ["job-1"], {"param": "ensure"}, version="every")
@@ -44,6 +44,7 @@ class TestJobSimple(unittest.TestCase):
                     "on_success": {
                         "put": "test_res_success",
                         "params": {"param": "success"},
+                        "get_params": {"test": True},
                     },
                     "on_failure": {
                         "put": "test_res_fail",
@@ -73,10 +74,11 @@ class TestJobSimple(unittest.TestCase):
             job.get("res-1", False, ["testjob"], params={"test": 1})
             job.get("res-2", True, ["testjob2"], params={"test": 2})
 
-            job.put("res-1", {"test": 3})
+            job.put("res-1", {"test": 3}, get_params={"test": True})
             job.put("res-2", {"test": 4})
 
             obj = job.concourse()
+            self.maxDiff = None
 
             obj["plan"] = obj["plan"][1:]  # remove init task. it is checked test_pipeline.py
             self.assertDictEqual(
@@ -99,6 +101,7 @@ class TestJobSimple(unittest.TestCase):
                         {
                             "put": "res-1",
                             "params": {"test": 3},
+                            "get_params": {"test": True},
                         },
                         {
                             "put": "res-2",

@@ -42,11 +42,11 @@ class Job:
         self.inputs.append(name)
         return resource_chain.resource.get(name)
 
-    def put(self, name, params=None):
+    def put(self, name, params=None, get_params=None):
         resource_chain = self.resource_chains.get(name, None)
         if not resource_chain:
             raise Exception("Resource " + name + " not configured for pipeline")
-        self.plan.append(PutStep(name, params))
+        self.plan.append(PutStep(name, params, get_params))
         resource_chain.passed.append(self.name)
         self.inputs.append(name)
         return resource_chain.resource.get(name)
@@ -134,15 +134,19 @@ class GetStep:
 
 
 class PutStep:
-    def __init__(self, name, params):
+    def __init__(self, name, params, get_params=None):
         self.name = name
         self.params = params
+        self.get_params = get_params
 
     def concourse(self):
-        return {
+        result = {
             "put": self.name,
             "params": self.params,
         }
+        if self.get_params is not None:
+            result["get_params"] = self.get_params
+        return result
 
 
 class TryStep:
@@ -201,8 +205,8 @@ class ParallelStep:
         self.job.inputs.append(name)
         return resource_chain.resource.get(name)
 
-    def put(self, name, params=None):
-        self.tasks.append(PutStep(name, params))
+    def put(self, name, params=None, get_params=None):
+        self.tasks.append(PutStep(name, params, get_params))
 
     def concourse(self):
         return {
