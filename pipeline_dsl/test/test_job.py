@@ -78,7 +78,6 @@ class TestJobSimple(unittest.TestCase):
             job.put("res-2", {"test": 4})
 
             obj = job.concourse()
-            self.maxDiff = None
 
             obj["plan"] = obj["plan"][1:]  # remove init task. it is checked test_pipeline.py
             self.assertDictEqual(
