@@ -36,6 +36,28 @@ class TestGitResource(unittest.TestCase):
             repo = GitRepo("https://example.com/repo.git", git_config={"user.name": "unknown", "user.email": "unknown@example.com"})
             self.assertEqual(repo.get("xxx").path, os.path.join(os.environ["HOME"], "workspace", "repo"))
 
+    def test_tags(self):
+        repo = GitRepo("https://example.com/repo.git", git_config={"user.name": "unknown", "user.email": "unknown@example.com"}, fetch_tags=True)
+
+        obj = repo.concourse(name="test")
+        self.assertEqual(
+            obj.source,
+            {
+                "uri": "https://example.com/repo.git",
+                "git_config": [
+                    {
+                        "name": "user.name",
+                        "value": "unknown",
+                    },
+                    {
+                        "name": "user.email",
+                        "value": "unknown@example.com",
+                    },
+                ],
+                "fetch_tags": True,
+            },
+        )
+
 
 class TestCronResource(unittest.TestCase):
     def test_basic(self):
