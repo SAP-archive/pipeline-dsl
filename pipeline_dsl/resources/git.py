@@ -53,6 +53,7 @@ class GitRepo(AbstractResource[GitRepoResource]):
         tag_filter: str = None,
         git_config: dict = {},
         private_key: str = None,
+        fetch_tags: bool = None,
     ):
         self.uri = uri
         self.username = username
@@ -63,6 +64,7 @@ class GitRepo(AbstractResource[GitRepoResource]):
         self.tag_filter = tag_filter
         self.git_config = git_config
         self.private_key = private_key
+        self.fetch_tags = fetch_tags
 
     def resource_type(self) -> Optional[Dict]:
         return None
@@ -82,6 +84,7 @@ class GitRepo(AbstractResource[GitRepoResource]):
                 "tag_filter": self.tag_filter,
                 "git_config": list(map(lambda kv: {"name": kv[0], "value": kv[1]}, self.git_config.items())),
                 "private_key": self.private_key,
+                "fetch_tags": self.fetch_tags,
             },
         )
         result.source = dict(

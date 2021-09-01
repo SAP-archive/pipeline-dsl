@@ -54,7 +54,7 @@ GoogleCloudStorageResource("my-bucket", "(.*).txt", "((MY_GCS_CREDENTIALS))")
 
 Upstream resource documentation: https://github.com/concourse/git-resource/blob/master/README.md
 
-Note: Only `uri`, `username`, `password`, `branch`, `ignore_paths`, `tag_filter`, `git_config` and `private_key` are currently supported supported in source configuration.
+Note: Only `uri`, `username`, `password`, `branch`, `ignore_paths`, `tag_filter`, `fetch_tags`, `git_config` and `private_key` are currently supported supported in source configuration.
 
 Example:
 ```python
