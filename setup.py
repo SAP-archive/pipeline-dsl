@@ -22,4 +22,10 @@ setuptools.setup(
         "pyyaml",
     ],
     python_requires=">=3.7",
+    package_dir={
+        "pipeline_dsl.utils": "pipeline_dsl/utils/",
+    },
+    package_data={
+        "pipeline_dsl.utils": ["*.sh"],
+    },
 )
