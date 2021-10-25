@@ -127,13 +127,13 @@ class Pipeline:
 
     def main(self):
         if self.args.dump:
-            from .dumper import NoTagDumper
+            from pipeline_dsl.utils.dumper import NoTagDumper
             import yaml
 
             yaml.dump(self.concourse(), sys.stdout, allow_unicode=True, Dumper=NoTagDumper)
             # fly -t concourse-sapcloud-garden set-pipeline -c  test.yaml -p "create-cluster"
         elif self.args.target:
-            from .dumper import NoTagDumper
+            from pipeline_dsl.utils.dumper import NoTagDumper
             import yaml
 
             config_file = f"/tmp/{self.name}.yaml"

@@ -1,5 +1,5 @@
 from pipeline_dsl import ConcourseResource
-from pipeline_dsl.concourse.dumper import NoTagDumper
+from pipeline_dsl.utils.dumper import NoTagDumper
 
 import unittest
 import yaml
