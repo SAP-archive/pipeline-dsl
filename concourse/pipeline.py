@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from pipeline_dsl import Pipeline, GitRepo, shell, SemVer, SemVerGitDriver, PyPi, concourse_context
 from pipeline_dsl.utils import modify_git_repo
 import re
