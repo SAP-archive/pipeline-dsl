@@ -1,4 +1,4 @@
-FROM python:3.7-slim
+FROM python:3-slim
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 RUN apt-get update \
