@@ -48,7 +48,14 @@ class GithubRelease(AbstractResource[GithubReleaseResource]):
         self.order_by = order_by
 
     def resource_type(self) -> Optional[dict]:
-        return None
+        return {
+            "name": "github-release",
+            "type": "docker-image",
+            "source": {
+                "repository": "concourse/github-release-resource",
+                "tag": "1.6.3",
+            },
+        }
 
     def concourse(self, name: str) -> ConcourseResource:
         result = ConcourseResource(
