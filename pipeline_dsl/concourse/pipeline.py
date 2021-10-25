@@ -8,7 +8,6 @@ import inspect
 from .__shared import CACHE_DIR, SCRIPT_DIR, concourse_context, set_concourse_context
 from .job import Job
 from .task import STARTER_DIR, PYTHON_DIR
-from .dumper import NoTagDumper
 
 
 def env_secret_manager(key):
@@ -128,16 +127,18 @@ class Pipeline:
 
     def main(self):
         if self.args.dump:
+            from .dumper import NoTagDumper
             import yaml
 
             yaml.dump(self.concourse(), sys.stdout, allow_unicode=True, Dumper=NoTagDumper)
             # fly -t concourse-sapcloud-garden set-pipeline -c  test.yaml -p "create-cluster"
         elif self.args.target:
+            from .dumper import NoTagDumper
             import yaml
 
             config_file = f"/tmp/{self.name}.yaml"
             with open(config_file, "w") as f:
-                yaml.dump(self.concourse(), f, allow_unicode=True)
+                yaml.dump(self.concourse(), f, allow_unicode=True, Dumper=NoTagDumper)
             subprocess.run(["fly", "-t", self.args.target, "set-pipeline", "-c", config_file, "-p", self.name, "-n"], check=True)
         elif self.args.job:
             try:
