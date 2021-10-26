@@ -19,6 +19,11 @@ test-examples:
 test-unit:
 	PYTHONPATH=$$(pwd) python3 -m"unittest"
 
+lint: lint-mypy
+
+lint-mypy:
+	mypy pipeline_dsl/
+
 dist:
 	python3 setup.py sdist
 
@@ -28,7 +33,7 @@ coverage:
 	coverage report --fail-under=75
 
 cicd-image-build:
-	docker build -t ${TARGET_CICD_IMAGE} concourse/docker
+	docker build -t ${TARGET_CICD_IMAGE} -f concourse/docker/Dockerfile .
 
 cicd-image-push: cicd-image-build
 	docker push ${TARGET_CICD_IMAGE}
