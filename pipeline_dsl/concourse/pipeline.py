@@ -1,5 +1,6 @@
 import sys
 import os
+import glob
 import shutil
 import subprocess
 import argparse
@@ -31,11 +32,17 @@ class Pipeline:
         }
         if isinstance(script_dirs, list):
             for script in script_dirs:
-                dir = os.path.abspath(os.path.join(dirname, script))
-                self.init_dirs[os.path.basename(dir)] = dir
+                globed = glob.glob(os.path.abspath(os.path.join(dirname, script)))
+                # If an exact file without glob is given, use the whole path otherwise use the dirname.
+                if len(globed) == 1 and globed[0] == os.path.join(dirname, script):
+                    key = script
+                else:
+                    key = os.path.dirname(script)
+                self.init_dirs[key] = globed
         else:
             for key, script in script_dirs.items():
-                self.init_dirs[key] = os.path.abspath(os.path.join(dirname, script))
+                globed = glob.glob(os.path.abspath(os.path.join(dirname, script)))
+                self.init_dirs[key] = globed
         self.jobs = []
         self.jobs_by_name = {}
         self.resource_chains = {}

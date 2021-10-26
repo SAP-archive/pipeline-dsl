@@ -99,8 +99,6 @@ class InitTask:
         init_dirs = sorted(list(self.init_dirs.items()), key=lambda d: len(d[1]), reverse=True)
 
         def filter(tarinfo):
-            if not (tarinfo.isdir() or tarinfo.name.endswith(".sh") or tarinfo.name.endswith(".py")):
-                return None
             tarinfo.uid = 0
             tarinfo.gid = 0
             tarinfo.uname = "root"
@@ -109,8 +107,13 @@ class InitTask:
             return tarinfo
 
         for dir_concourse, dir_local in init_dirs:
-            dir_local = os.path.abspath(dir_local)
-            tar.add(dir_local, arcname=dir_concourse, filter=filter)
+            if isinstance(dir_local, list):
+                for local_dir in dir_local:
+                    local_dir = os.path.abspath(local_dir)
+                    tar.add(local_dir, arcname=dir_concourse, filter=filter)
+            else:
+                local_dir = os.path.abspath(dir_local)
+                tar.add(local_dir, arcname=dir_concourse, filter=filter)
         tar.close()
         return base64.b64encode(buffer.getvalue()).decode("utf-8")
 
