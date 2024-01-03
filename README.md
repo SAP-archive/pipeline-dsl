@@ -1,10 +1,14 @@
+![](https://img.shields.io/badge/STATUS-NOT%20CURRENTLY%20MAINTAINED-red.svg?longCache=true&style=flat)
+
+# Important Notice
+This public repository is read-only and no longer maintained.
+
 # Pipeline DSL for [Concourse](https://concourse-ci.org/) 
 
 [![downloads](https://static.pepy.tech/badge/pipeline-dsl/month)](https://pypi.org/project/pipeline-dsl/)
 [![python](https://img.shields.io/badge/python-3.7-blue.svg)](https://pypi.org/project/pipeline-dsl/)
 [![pypi](https://img.shields.io/pypi/v/pipeline-dsl.svg)](https://pypi.org/project/pipeline-dsl/)
 [![license](https://img.shields.io/pypi/l/pipeline-dsl.svg)](https://pypi.org/project/pipeline-dsl/)
-[![REUSE status](https://api.reuse.software/badge/github.com/SAP/pipeline-dsl)](https://api.reuse.software/info/github.com/SAP/pipeline-dsl)
 
 ## Features
 
